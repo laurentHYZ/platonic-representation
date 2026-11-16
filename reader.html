@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>柏拉图表示定理 · 朗读器</title>
+<style>
+:root{
+  --bg:#fbfaf6; --fg:#1e1d1a; --mut:#7b7870; --bar:rgba(251,250,246,.9);
+  --bd:#e3dfd3; --panel:#f4f1e8; --hl:#ffe6a3; --hlf:#241a05; --ac:#9a3b17;
+  --ok:#2f6b3f; --bad:#a3341f;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#161615; --fg:#e9e8e1; --mut:#9c9a90; --bar:rgba(22,22,21,.9);
+    --bd:#34332e; --panel:#1e1d1a; --hl:#6f5a12; --hlf:#fff6dc; --ac:#e9a878;
+    --ok:#8ed0a4; --bad:#f0a08a;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#161615; --fg:#e9e8e1; --mut:#9c9a90; --bar:rgba(22,22,21,.9);
+  --bd:#34332e; --panel:#1e1d1a; --hl:#6f5a12; --hlf:#fff6dc; --ac:#e9a878;
+  --ok:#8ed0a4; --bad:#f0a08a;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:150px;scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--fg);
+  font:18px/2.55 "PingFang SC","Noto Sans CJK SC","Source Han Sans SC","Microsoft YaHei",system-ui,sans-serif;
+  -webkit-text-size-adjust:100%;
+}
+/* ---------- 顶栏 ---------- */
+#bar{
+  position:sticky;top:0;z-index:20;background:var(--bar);
+  -webkit-backdrop-filter:saturate(1.4) blur(10px);backdrop-filter:saturate(1.4) blur(10px);
+  border-bottom:1px solid var(--bd);
+  display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;
+  padding:9px 16px calc(9px + env(safe-area-inset-bottom,0px)/4);
+}
+#bar .g{display:flex;align-items:center;gap:6px}
+#bar .sep{width:1px;height:22px;background:var(--bd)}
+button,select,input{font:inherit;font-size:13.5px;color:var(--fg)}
+button,select{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:5px 11px;cursor:pointer;transition:border-color .15s,background .15s}
+button:hover{border-color:var(--ac)}
+button:active{transform:translateY(.5px)}
+button.primary{background:var(--ac);border-color:var(--ac);color:#fff;min-width:88px;font-weight:600}
+button.ghost{background:transparent}
+button:disabled{opacity:.45;cursor:not-allowed}
+.mi{font-size:12.5px;color:var(--mut);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+label.chk{font-size:12.5px;color:var(--mut);display:inline-flex;align-items:center;gap:5px;cursor:pointer;user-select:none}
+input[type=range]{accent-color:var(--ac);height:18px;cursor:pointer}
+#bar select{max-width:230px}
+select{max-width:100%}
+#prog{width:150px;flex:0 0 auto}
+#st{font-size:12.5px;color:var(--mut);white-space:nowrap;font-variant-numeric:tabular-nums}
+/* ---------- 设置面板 ---------- */
+#panel{background:var(--panel);border-bottom:1px solid var(--bd);padding:14px 18px 18px}
+#panel[hidden]{display:none}
+#panel h3{margin:0 0 10px;font-size:13px;font-weight:600;color:var(--mut);letter-spacing:.04em}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px 28px;max-width:1080px}
+.f{display:flex;flex-direction:column;gap:5px;min-width:0}
+.f>span.k{font-size:12px;color:var(--mut)}
+.f input[type=text],.f input[type=password]{width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:7px 10px}
+.f select{width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:6px 8px}
+.f input[type=text]:focus,.f input[type=password]:focus{outline:2px solid color-mix(in srgb,var(--ac) 45%,transparent);outline-offset:1px;border-color:var(--ac)}
+.f .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.f .val{font-variant-numeric:tabular-nums;color:var(--ac);font-size:12.5px}
+.note{margin:12px 0 0;font-size:12.5px;line-height:1.85;color:var(--mut);max-width:78ch}
+.note b{color:var(--fg);font-weight:600}
+.note code{font-size:12px;background:color-mix(in srgb,var(--fg) 8%,transparent);padding:1px 5px;border-radius:4px}
+/* ---------- 正文 ---------- */
+main{max-width:780px;margin:0 auto;padding:26px 22px 55vh}
+h1{font-size:27px;line-height:1.5;margin:.5em 0 .3em;letter-spacing:.01em}
+.hint{font-size:13px;color:var(--mut);line-height:2;margin:0 0 2em}
+kbd{border:1px solid var(--bd);border-bottom-width:2px;border-radius:5px;padding:0 6px;font-size:11.5px;font-family:ui-monospace,monospace;color:var(--fg);background:var(--bg)}
+h2{font-size:20px;margin:2.4em 0 .7em;color:var(--ac);border-bottom:1px solid var(--bd);padding-bottom:6px;font-weight:600}
+p{margin:.9em 0}
+.s{cursor:pointer;border-radius:7px;transition:background .2s,box-shadow .2s}
+.s:hover{background:color-mix(in srgb,var(--hl) 45%,transparent)}
+.s.cur{background:color-mix(in srgb,var(--hl) 22%,transparent);box-shadow:0 0 0 .32em color-mix(in srgb,var(--hl) 22%,transparent)}
+.w{border-radius:4px;transition:background .1s,color .1s}
+.w.on{background:var(--hl);color:var(--hlf)}
+ruby{ruby-position:over;ruby-align:center}
+ruby rt{font-size:.48em;color:var(--ac);font-weight:500;letter-spacing:0;line-height:1.1;font-family:system-ui,sans-serif}
+.en{display:none;font-size:.62em;color:var(--mut);margin:0 1px;font-family:system-ui,sans-serif}
+body.en .en{display:inline}
+.hint a{color:var(--ac);text-decoration:none;border-bottom:1px solid currentColor}
+body.nopy rt{display:none}
+/* ---------- 提示条 ---------- */
+#toast{
+  position:fixed;left:50%;bottom:22px;transform:translate(-50%,16px);z-index:50;
+  background:var(--fg);color:var(--bg);font-size:13px;line-height:1.6;padding:9px 16px;border-radius:10px;
+  max-width:min(90vw,560px);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+  box-shadow:0 8px 30px rgba(0,0,0,.22)
+}
+.diag{margin:12px 0 0;font:12px/1.75 ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--bg);
+  border:1px solid var(--bd);border-radius:8px;padding:10px 12px;white-space:pre-wrap;
+  max-height:240px;overflow:auto;color:var(--fg)}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#toast.bad{background:var(--bad);color:#fff}
+@media (max-width:720px){
+  body{font-size:17px;line-height:2.4}
+  #prog{width:100px}
+  main{padding:20px 16px 55vh}
+  h1{font-size:23px}
+}
+</style>
+</head>
+<body>
+
+<div id="bar">
+  <div class="g">
+    <button id="play" class="primary">▶ 播放</button>
+    <button id="prev" title="上一句（←）">⏮</button>
+    <button id="next" title="下一句（→）">⏭</button>
+  </div>
+  <div class="sep"></div>
+  <div class="g">
+    <input id="prog" type="range" min="1" max="1" step="1" value="1" aria-label="句子进度">
+    <span id="st">1 / 1</span>
+  </div>
+  <div class="sep"></div>
+  <div class="g">
+    <span class="mi">语速</span>
+    <input id="rate" type="range" min="0.5" max="2" step="0.05" value="1" aria-label="语速" style="width:92px">
+    <span id="rv" class="mi" style="width:34px">1.0×</span>
+  </div>
+  <div class="sep"></div>
+  <div class="g">
+    <select id="engine" aria-label="语音引擎">
+      <option value="browser">浏览器语音</option>
+      <option value="cloud">Kokoro（OpenRouter）</option>
+    </select>
+    <select id="voice" aria-label="音色" style="max-width:250px"></select>
+    <button id="gear" title="Kokoro / OpenRouter 设置" aria-label="设置">⚙</button>
+  </div>
+  <div class="g" style="margin-left:auto">
+    <label class="chk"><input type="checkbox" id="tpy" checked>拼音</label>
+    <label class="chk"><input type="checkbox" id="ten">English</label>
+  </div>
+</div>
+
+<section id="panel" hidden>
+  <h3>Kokoro（OpenRouter）设置</h3>
+  <div class="grid">
+    <div class="f">
+      <span class="k">OpenRouter API Key（只存在你本机）</span>
+      <input id="key" type="password" placeholder="sk-or-v1-..." autocomplete="off" spellcheck="false">
+      <label class="chk"><input type="checkbox" id="remember"> 记住（写入 localStorage）</label>
+      <span class="k" id="keyState">未填写 Key</span>
+    </div>
+    <div class="f">
+      <span class="k">模型</span>
+      <select id="model">
+        <option value="hexgrad/kokoro-82m">hexgrad/kokoro-82m</option>
+      </select>
+      <span class="k">接口地址</span>
+      <input id="endpoint" type="text" value="https://openrouter.ai/api/v1" spellcheck="false">
+    </div>
+    <div class="f">
+      <span class="k">对时偏移 <span class="val" id="syncv">0.00 s</span></span>
+      <input id="sync" type="range" min="-0.6" max="0.6" step="0.05" value="0">
+      <span class="k">高亮比声音早 → 往右；晚 → 往左（播放中按 <b>[</b> <b>]</b> 也能调）</span>
+      <div class="row">
+        <button id="test">试听</button>
+        <button id="diag">自检</button>
+        <button id="clear" class="ghost">清除 Key</button>
+      </div>
+    </div>
+  </div>
+  <pre id="diagLog" class="diag" hidden></pre>
+  <p class="note">
+    朗读走 <b>POST /audio/speech</b>：<code>model=hexgrad/kokoro-82m</code>、<code>input=句子</code>、<code>voice=音色</code>、<code>response_format=mp3</code>，
+    返回的是<b>原始音频</b>，没有时间戳。所以这里<b>先把音频解码</b>，用 RMS 包络找出发声段和停顿，
+    把句中标点处的停顿对齐到真实静音，再在每个发声段内按字权重（中文每字 1 份）分配——
+    高亮因此跟着真实语音走。仍有极少数句子快慢不合时，用「对时偏移」或 <kbd>[</kbd> <kbd>]</kbd> 微调。<br>
+    每句一次请求（本页 <b id="nUnits">?</b> 句、约 4,150 字），按 DeepInfra 的 $0.62/M 字符算，整篇约 <b>$0.003</b>。
+    若某个音色报 <code>400 请求参数不被支持</code>，是当前 provider 不支持该音色，稍后重试或换 <code>zf_xiaoxiao</code>。
+    跨域被拦时，把本页放到 <code>http://localhost</code> 下，或在「接口地址」填代理。
+  </p>
+</section>
+
+<main>
+  <h1>柏拉图表示定理</h1>
+  <p class="hint">
+    <kbd>空格</kbd> 播放 / 暂停 · <kbd>←</kbd> <kbd>→</kbd> 上一句 / 下一句 ·
+    点任意<b>词</b>从该词读起 · 朗读时按<b>词</b>逐个高亮 · <kbd>[</kbd> <kbd>]</kbd> 对时 · <kbd>⚙</kbd> 音色 · <a href="index.html">一页讲清 →</a>
+  </p>
+  <div id="doc"></div>
+</main>
+
+<div id="toast"></div>
+
+<script>
+(function () {
+'use strict';
+
+/* ============================================================
+   文章数据
+   ============================================================ */
+const DATA = [
+["摘要",[
+"不同模态上训练的模型是否会收敛到相同的世界表示，是人工智能的核心问题。柏拉图表示假说（PRH）推测，随着模型规模扩大，它们会收敛到相同表示；但缺少证明使其既无法提供保证，也无法提供方法。我们将该假说转化为定理。",
+"首先，我们证明了一个柏拉图表示定理：在任意数量模态上分别训练的联合嵌入预测架构（JEPAs），当其正样本对是同一场景的两个观测——即好视图——且在其他情况下失配程度有界时，所学的表示相同，至多相差一个旋转。",
+"其次，我们证明下一 token 预测是一种具有坏视图的 JEPA，其视图是单个文档的片段，这解释了为什么语言模型只能通过规模与视觉对齐。",
+"第三，我们验证了该理论，实验覆盖从 145k 条图像描述到 9.4 亿张网络图像的文本，并发现一条对齐缩放定律，能够在种子噪声范围内预测未见过的训练运行。在相同语料库上，好视图达到相同对齐程度所需的训练样本比下一 token 预测少 42 倍；一个 109M 参数的文本 JEPA 与 DINOv2 和 CLIP 的图像编码器对齐效果优于我们评估的所有语言模型（参数量高达 72B），也优于 CLIP 的文本编码器：下一 token 预测是通向柏拉图表示的一条效率极低的路径。",
+"作为示例，一个旋转即可将分别训练的编码器变为图像描述生成器（在 COCO 上 CIDEr 为 .838）。即便该旋转也不需要成对数据：在最新的无成对数据基准上，我们的文本 JEPA 超过了所有已报告的、使用高达 8B 参数语言模型得到的零样本准确率，例如在 ImageNet-100 上 top-5 准确率为 64%，而最高仅为 56%。因此，好视图——而非仅仅依赖规模——才是构建柏拉图表示的关键杠杆。"]],
+["一句话总结",[
+"来自布朗大学、纽约大学和 AMI Labs 的研究者证明了一个柏拉图表示定理：在任意数量的模态上、使用良好视图分别训练的联合嵌入预测架构会学到只差一个旋转的相同表示；他们还证明，next-token 预测是一种具有坏视图的低效 JEPA，并且通过一个 109M 参数文本 JEPA 在对齐和零样本基准上优于最高 72B 参数的语言模型来展示这一点。"]],
+["核心贡献",[
+"一，柏拉图表示定理：当正样本对是同一场景的两个观测，且其他情况下未对齐程度有界时，在任意数量模态上分别训练的 JEPA 会学到只差一个旋转的相同表示。",
+"二，next-token 预测被识别为一种具有坏视图的 JEPA，其中正样本是同一文档的部分内容；这解释了为什么语言模型只能通过规模来与视觉对齐，实验表明，在相同语料上，良好视图所需的训练样本比 next-token 预测少 42 倍。",
+"三，经验验证覆盖从 145k 条图像描述到 9.4 亿张网页图像，并发现一个对齐的缩放定律。一个 109M 参数文本 JEPA 与 DINOv2 和 CLIP 图像编码器的对齐程度优于最高 72B 参数的语言模型以及 CLIP 的文本编码器，并且一个学习到的旋转将分别训练的编码器变成 COCO 上 CIDEr 为 .838 的图像描述器；在无配对基准上，该文本 JEPA 还超过了所有已报告的、参数最高 8B 的语言模型的零样本准确率，例如在 ImageNet-100 上 top-5 为 64%，而最高为 56%。"]],
+["引言",[
+"深度网络重新提出一个老问题：同一世界的不同观察者是否会收敛到相同表示。经验上，词嵌入和视觉-语言模型表现出越来越强的跨模态对齐，Huh 等人将这一现象称为柏拉图表示假设，但对于联合嵌入预测架构这类实际自监督目标，这仍只是观察而缺乏证明。",
+"作者将这一观察转变为关于 JEPA 的定理。他们证明，当分别训练的 JEPA 使用关联相同世界状态的正样本对时，它们学到的表示只差一个旋转；而当正样本只是破坏单个观测时，编码器会将容量花费在模态特有的干扰因素上，这些干扰因素无法通过旋转对齐。这将该假设重新表述为关于正视图的命题，并给出训练原则；实验结果表明，良好视图 JEPA 比 next-token 预测对齐得更好，并且数据效率更高。"]],
+["方法",[
+"作者通过单射渲染形式化由多个模态观测的世界。针对特定模态的 JEPA 在从分布中抽取的正样本对上训练。核心目标最小化预测项加上一个防坍缩项。作者证明了柏拉图表示定理，该定理表明，如果多个模态在世界状态上共享相同的正样本对分布，那么它们的编码器学到的世界嵌入只差一个旋转。这对具有二阶防坍缩的谱 JEPA 成立，它们学习由正样本对定义的图的前几个特征向量。",
+"对齐质量关键取决于正样本对的性质。作者区分了良好视图和坏视图 JEPA。良好视图 JEPA 使用由同一世界状态的两个独立观测组成的正样本对，例如同一场景的两张照片或描述该场景的两个图像描述。这些 JEPA 忽略模态特有的干扰因素，仅学习世界状态的函数。坏视图 JEPA 使用由单个观测的破坏构成的正样本对，例如一张图像的两个裁剪或一个句子的两个掩码。这些 JEPA 往往把嵌入维度花费在破坏之间共享的干扰因素上，而这些干扰因素无法通过旋转跨模态对齐。",
+"良好视图通过设计诱导世界自身的核，从而在只差一个旋转的情况下实现完美对齐，而坏视图和 next-token 预测依赖数据密度来连接状态，并且常混入干扰因素。一个良好视图 JEPA 与 DINOv2 实现的对齐程度与 next-token 预测相同，但所需样本少 42 倍。",
+"良好视图连接同一场景的所有描述，而不会串到其他场景。坏视图和 next-token 预测则在场景内部建立稀疏连接，或因共享干扰因素而溢出到不同场景之间。",
+"在实际中，不同模态很少共享完全相同的正样本对。作者基于不同模态正样本对所诱导核之间的不匹配，给出了未对齐程度的一个上界。最佳旋转后嵌入之间的均方根距离受核之间的差异和谱间隙约束。这个上界在随机生成的有限世界上得到了经验验证，误差始终低于理论界限。",
+"作者还分析了坏视图的覆盖范围与所需数据量之间的权衡。更弱的正样本需要每个世界状态显著更多的样本才能实现对齐。",
+"作者将 next-token 预测形式化为一种 JEPA。其正样本是单个文档中的前缀及其后续内容。由于前缀和后续内容共享该文档特有的干扰因素，next-token 预测表现为一种坏视图 JEPA。它把嵌入方向花费在这种干扰因素上，这解释了为什么与良好视图 JEPA 相比，语言模型需要极大规模才能与视觉模型对齐。",
+"利用表示只差一个旋转这一定理，作者设计了一个无需在图像-描述配对数据上训练网络的图像描述系统。文本 JEPA 和因果 Transformer 解码器仅在文本上训练。图像使用冻结的视觉编码器。通过在一小组图像-描述配对数据上拟合单个旋转矩阵，将冻结的图像嵌入与文本嵌入空间对齐。要为图像生成描述，先将其嵌入，再旋转，然后解码。嵌入中加入高斯噪声以容忍残余对齐误差。系统使用仅通过一个旋转连接的冻结编码器，却能准确描述场景、物体和动作。"]],
+["实验",[
+"这些实验评估使用 JEPA 目标分别训练的图像和文本编码器，通过检索、互最近邻和基于旋转的映射，在 Flickr30k、MSR-VTT、COCO 以及大型网页文本语料上测量跨模态对齐。它们验证：从同一世界状态的不同观测中抽取并经过修剪的良好视图，在相同数据上始终比坏视图或 next-token 预测对齐得更好，其中修剪是主要因素，并且两种模态都受益。结果进一步表明，良好视图 JEPA 在样本效率上远超 next-token 预测，优于大得多的语言模型，接近使用成对数据训练的编码器，并且能够在很少甚至没有成对图像-描述监督的情况下实现图像描述和对齐。",
+"与使用坏视图 JEPA 或 next-token 预测训练的编码器相比，使用良好视图 JEPA 训练的文本编码器在 Flickr 测试对上与图像 JEPA 的对齐更强。这一优势出现在互最近邻重叠和基于旋转拟合的检索指标上。图像描述视图在 mutual 10-NN、R@1 和 R@5 上优于掩码片段和 next-token 预测，差距大于种子波动。将 next-token 预测用于同一图像的两个图像描述对进行训练，相比标准 next-token 预测几乎没有提升，因此对齐优势来自 JEPA 目标。",
+"当与冻结的 DINOv2 ViT-B/14 配对时，良好视图 JEPA 文本编码器在所列模型中表现出最强的对齐，检索得分约为坏视图 JEPA 和 next-token 基线的两倍。它在相同指标上也超过了预训练的 Qwen2.5-0.5B 和 BERT-base 文本编码器。在 30k Flickr 训练和验证对上拟合旋转后，检索进一步提升，良好视图 JEPA 仍然是作者模型中最好的。",
+"一个在 9 亿条图像衍生文本样本上训练的 109M 参数良好视图 JEPA，与 DINOv2 和 CLIP 视觉编码器的对齐强于最高 72B 参数的语言模型。这一优势出现在 mutual 10-NN、线性 CKA 和 COCO 检索上，而在相同文本上训练的 next-token 预测和坏视图 JEPA 则远远落后。驱动对齐提升的似乎是良好视图目标，而不只是文本数据本身。",
+"一个 109M 良好视图 JEPA 在无需成对示例的情况下对齐视觉和文本，优于先前的无配对方法，在比较中取得最低的 FOSCTTM 和最高的零样本分类准确率。在相同条件下，它与重跑的 Qwen3-8B 持平或更优，而在相同文本上的 next-token 预测在 FOSCTTM 上接近随机，零样本准确率则差得多。这表明驱动基于几何的对齐的是良好视图 JEPA 表示，而不是 next-token 文本训练。它在 FOSCTTM 和 CIFAR-10 上与重跑的 Qwen3-8B 持平，在 CIFAR-100 和 ImageNet-100 上以明显优势超过它。一个更小的 33M 良好视图 JEPA 仍然超过了先前最佳的无配对零样本准确率。",
+"良好视图 JEPA 目标始终带来更强的跨模态对齐和检索，通常超过大得多的语言模型和先前的无配对结果，而 next-token 和坏视图基线仍然较弱。这些收益来自 JEPA 视图设计，而不是文本数据或成对图像描述。"]]
+];
+
+const GL = `柏拉图表示假说|Bólātú biǎoshì jiǎshuō|Platonic Representation Hypothesis
+柏拉图表示假设|Bólātú biǎoshì jiǎshè|Platonic Representation Hypothesis
+柏拉图表示定理|Bólātú biǎoshì dìnglǐ|Platonic Representation Theorem
+柏拉图表示|Bólātú biǎoshì|Platonic representation
+联合嵌入预测架构|liánhé qiànrù yùcè jiàgòu|Joint-Embedding Predictive Architecture
+世界表示|shìjiè biǎoshì|world representation
+世界嵌入|shìjiè qiànrù|world embedding
+世界状态|shìjiè zhuàngtài|world state
+模态|mótài|modality
+收敛|shōuliǎn|converge
+定理|dìnglǐ|theorem
+假设|jiǎshè|hypothesis
+证明|zhèngmíng|prove / proof
+保证|bǎozhèng|guarantee
+表示|biǎoshì|representation
+嵌入|qiànrù|embedding
+规模|guīmó|scale
+杠杆|gànggǎn|lever
+正样本对|zhèng yàngběn duì|positive pair
+正样本|zhèng yàngběn|positive sample
+正视图|zhèng shìtú|positive view
+好视图|hǎo shìtú|good view
+良好视图|liánghǎo shìtú|good view
+坏视图|huài shìtú|bad view
+视图|shìtú|view
+失配程度|shīpèi chéngdù|degree of mismatch
+未对齐程度|wèi duìqí chéngdù|degree of misalignment
+有界|yǒujiè|bounded
+旋转矩阵|xuánzhuǎn jǔzhèn|rotation matrix
+旋转|xuánzhuǎn|rotation
+下一 token 预测|xià yī token yùcè|next-token prediction
+next-token 预测|next-token yùcè|next-token prediction
+语言模型|yǔyán móxíng|language model
+视觉-语言模型|shìjué-yǔyán móxíng|vision-language model
+对齐缩放定律|duìqí suōfàng dìnglǜ|alignment scaling law
+缩放定律|suōfàng dìnglǜ|scaling law
+跨模态对齐|kuà mótài duìqí|cross-modal alignment
+对齐|duìqí|alignment
+种子噪声|zhǒngzi zàoshēng|seed noise
+种子波动|zhǒngzi bōdòng|seed variance
+语料库|yǔliàokù|corpus
+语料|yǔliào|corpus
+参数量|cānshùliàng|parameter count
+图像编码器|túxiàng biānmǎqì|image encoder
+视觉编码器|shìjué biānmǎqì|vision encoder
+文本编码器|wénběn biānmǎqì|text encoder
+编码器|biānmǎqì|encoder
+因果 Transformer 解码器|yīnguǒ Transformer jiěmǎqì|causal Transformer decoder
+解码|jiěmǎ|decode
+图像描述生成器|túxiàng miáoshù shēngchéngqì|image captioner
+图像描述器|túxiàng miáoshùqì|image captioner
+图像描述|túxiàng miáoshù|image caption
+成对数据|chéngduì shùjù|paired data
+配对数据|pèiduì shùjù|paired data
+无成对数据|wú chéngduì shùjù|unpaired data
+无配对|wú pèiduì|unpaired
+基准|jīzhǔn|benchmark
+基线|jīxiàn|baseline
+零样本准确率|líng yàngběn zhǔnquèlǜ|zero-shot accuracy
+零样本分类准确率|líng yàngběn fēnlèi zhǔnquèlǜ|zero-shot classification accuracy
+自监督目标|zì jiāndū mùbiāo|self-supervised objective
+深度网络|shēndù wǎngluò|deep network
+词嵌入|cí qiànrù|word embedding
+干扰因素|gānrǎo yīnsù|nuisance factor
+训练原则|xùnliàn yuánzé|training principle
+训练样本|xùnliàn yàngběn|training sample
+数据效率|shùjù xiàolǜ|data efficiency
+样本效率|yàngběn xiàolǜ|sample efficiency
+单射渲染|dānshè xuànrǎn|injective rendering
+预测项|yùcè xiàng|prediction term
+防坍缩项|fáng tānsuō xiàng|anti-collapse term
+二阶防坍缩|èr jiē fáng tānsuō|second-order anti-collapse
+谱间隙|pǔ jiànxì|spectral gap
+谱 JEPA|pǔ JEPA|spectral JEPA
+特征向量|tèzhēng xiàngliàng|eigenvector
+核|hé|kernel
+数据密度|shùjù mìdù|data density
+稀疏连接|xīshū liánjiē|sparse connection
+均方根距离|jūnfānggēn jùlí|root-mean-square distance
+上界|shàngjiè|upper bound
+不匹配|bù pǐpèi|mismatch
+有限世界|yǒuxiàn shìjiè|finite world
+覆盖范围|fùgài fànwéi|coverage
+权衡|quánhéng|trade-off
+前缀|qiánzhuì|prefix
+后续内容|hòuxù nèiróng|continuation
+文档|wéndàng|document
+片段|piànduàn|segment
+冻结|dòngjié|frozen
+高斯噪声|Gāosī zàoshēng|Gaussian noise
+残余对齐误差|cányú duìqí wùchā|residual alignment error
+检索|jiǎnsuǒ|retrieval
+互最近邻|hù zuìjìnlín|mutual nearest neighbors
+映射|yìngshè|mapping
+修剪|xiūjiǎn|pruning
+监督|jiāndū|supervision
+指标|zhǐbiāo|metric
+重叠|chóngdié|overlap
+拟合|nǐhé|fitting
+掩码片段|yǎnmǎ piànduàn|masked span
+掩码|yǎnmǎ|mask
+裁剪|cáijiǎn|crop
+破坏|pòhuài|corruption
+嵌入维度|qiànrù wéidù|embedding dimension
+预训练|yùxùnliàn|pre-trained
+验证|yànzhèng|validation
+线性 CKA|xiànxìng CKA|linear centered kernel alignment
+随机|suíjī|random
+基于几何的对齐|jīyú jǐhé de duìqí|geometry-based alignment
+经验验证|jīngyàn yànzhèng|empirical validation`;
+
+/* ============================================================
+   基础工具
+   ============================================================ */
+const $ = (id) => document.getElementById(id);
+const html = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+let lsBroken = false;
+function lsGet(k) { try { return window.localStorage.getItem(k); } catch (e) { lsBroken = true; return null; } }
+function lsSet(k, v) { try { window.localStorage.setItem(k, v); } catch (e) { lsBroken = true; } }
+function lsDel(k) { try { window.localStorage.removeItem(k); } catch (e) { lsBroken = true; } }
+
+/* ============================================================
+   词表与注释
+   ============================================================ */
+const MAP = Object.create(null);
+GL.split('\n').forEach((line) => {
+  const [zh, py, en] = line.split('|');
+  if (zh && py && en) MAP[zh] = [py, en];
+});
+const KEYS = Object.keys(MAP).sort((a, b) => b.length - a.length);
+const PATTERN = KEYS.map((k) => {
+  let p = k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  if (k === '核') p = '核(?!心)';
+  return p;
+}).join('|');
+const RE = new RegExp(PATTERN, 'g');
+
+function annotate(s) {
+  return s.replace(RE, (m) => {
+    const g = MAP[m];
+    if (!g) return m;
+    return '<ruby>' + m + '<rt>' + html(g[0]) + '</rt></ruby><span class="en">(' + html(g[1]) + ')</span>';
+  });
+}
+
+const SEG = (typeof Intl !== 'undefined' && Intl.Segmenter) ? new Intl.Segmenter('zh-CN', { granularity: 'word' }) : null;
+
+function segments(text) {
+  const raw = [];
+  if (SEG) {
+    for (const s of SEG.segment(text)) raw.push({ text: s.segment, start: s.index, word: !!s.isWordLike });
+  } else {
+    for (let i = 0; i < text.length; i++) {
+      raw.push({ text: text[i], start: i, word: !/[\s。，、；：？！…—（）《》〈〉“”‘’·]/.test(text[i]) });
+    }
+  }
+  const out = [];
+  for (const seg of raw) {
+    if (!seg.word && out.length) {
+      const last = out[out.length - 1];
+      last.text += seg.text;
+      last.end = seg.start + seg.text.length;
+    } else {
+      out.push({ text: seg.text, start: seg.start, end: seg.start + seg.text.length, word: seg.word });
+    }
+  }
+  return out;
+}
+
+/* ============================================================
+   渲染正文
+   ============================================================ */
+const docEl = $('doc');
+const units = [];
+
+function splitSentences(t) {
+  return (t.match(/[^。！？]+[。！？]?/g) || []).filter((s) => s.trim());
+}
+
+function wrapTokens(root, u) {
+  const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while (tw.nextNode()) nodes.push(tw.currentNode);
+
+  let pos = 0;
+  for (const node of nodes) {
+    const host = node.parentElement;
+    if (host && host.closest('rt, .en')) continue;
+    const text = node.nodeValue;
+    if (!text) continue;
+    const base = pos;
+    pos += text.length;
+
+    const frag = document.createDocumentFragment();
+    for (const seg of segments(text)) {
+      const span = document.createElement('span');
+      span.className = 'w' + (seg.word ? '' : ' nw');
+      span.textContent = seg.text;
+      span.dataset.s = String(base + seg.start);
+      span.dataset.e = String(base + seg.end);
+      u.tokens.push({ el: span, s: base + seg.start, e: base + seg.end });
+      frag.appendChild(span);
+    }
+    node.parentNode.replaceChild(frag, node);
+  }
+
+  u.map = new Int16Array(u.text.length).fill(-1);
+  u.tokens.forEach((tk, i) => {
+    for (let k = tk.s; k < tk.e && k < u.map.length; k++) u.map[k] = i;
+  });
+}
+
+function render() {
+  for (const [title, paras] of DATA) {
+    const h = document.createElement('h2');
+    h.textContent = title;
+    docEl.appendChild(h);
+
+    for (const text of paras) {
+      const p = document.createElement('p');
+      for (const sent of splitSentences(text)) {
+        const u = { index: units.length, text: sent, tokens: [], map: null, el: null, cur: -1 };
+        const span = document.createElement('span');
+        span.className = 's';
+        span.dataset.i = String(u.index);
+        span.innerHTML = annotate(sent);
+        wrapTokens(span, u);
+        u.el = span;
+        p.appendChild(span);
+        units.push(u);
+      }
+      docEl.appendChild(p);
+    }
+  }
+}
+
+/* ============================================================
+   状态
+   ============================================================ */
+const S = {
+  idx: 0, playing: false, paused: false, finished: false, gen: 0,
+  char: 0, resumeChar: 0, engine: 'browser', rate: 1, sync: 0,
+  audio: null, speaking: null
+};
+
+const els = {
+  play: $('play'), prev: $('prev'), next: $('next'), prog: $('prog'), st: $('st'),
+  rate: $('rate'), rv: $('rv'), engine: $('engine'), voice: $('voice'), gear: $('gear'),
+  panel: $('panel'), toast: $('toast'), tpy: $('tpy'), ten: $('ten')
+};
+
+let toastTimer = 0;
+function toast(msg, bad) {
+  els.toast.textContent = msg;
+  els.toast.classList.toggle('bad', !!bad);
+  els.toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => els.toast.classList.remove('show'), bad ? 6000 : 2400);
+}
+
+/* ============================================================
+   高亮
+   ============================================================ */
+let hlUnit = -1;
+
+function clearToken(u) {
+  if (u.cur >= 0 && u.tokens[u.cur]) u.tokens[u.cur].el.classList.remove('on');
+  u.cur = -1;
+}
+
+function highlightToken(u, k) {
+  if (!u || k < 0 || k >= u.tokens.length) return;
+  if (u.cur === k) return;
+  clearToken(u);
+  u.cur = k;
+  u.tokens[k].el.classList.add('on');
+}
+
+function highlightAt(i, off) {
+  const u = units[i];
+  if (!u) return;
+  if (hlUnit !== i) {
+    const prev = units[hlUnit];
+    if (prev) clearToken(prev);
+    hlUnit = i;
+  }
+  let k = (off >= 0 && off < u.map.length) ? u.map[off] : -1;
+  if (k < 0) {
+    for (let j = Math.min(off, u.map.length - 1); j >= 0; j--) { if (u.map[j] >= 0) { k = u.map[j]; break; } }
+  }
+  if (k >= 0) highlightToken(u, k);
+}
+
+function setCurrent(i, opt) {
+  opt = opt || {};
+  units.forEach((u) => u.el.classList.remove('cur'));
+  const u = units[i];
+  if (!u) return;
+  u.el.classList.add('cur');
+  if (!dragging) els.prog.value = String(i + 1);
+  els.st.textContent = (i + 1) + ' / ' + units.length;
+  lsSet('prh.pos', String(i));
+  if (opt.scroll !== false) {
+    const r = u.el.getBoundingClientRect();
+    const top = window.scrollY + r.top - window.innerHeight * 0.42;
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  }
+}
+
+function ui() {
+  els.play.textContent = (S.playing && !S.paused) ? '⏸ 暂停' : '▶ 播放';
+}
+
+/* ============================================================
+   浏览器语音
+   ============================================================ */
+const synth = window.speechSynthesis || null;
+let voices = [];
+
+function pickVoice() {
+  const want = els.voice.value;
+  return voices.find((x) => x.voiceURI === want) || voices[0] || null;
+}
+
+function browserPlay(i, fromChar, gen) {
+  return new Promise((resolve) => {
+    if (!synth) { resolve('error:此浏览器不支持语音合成'); return; }
+    const u = units[i];
+    const rest = u.text.slice(fromChar);
+    const utt = new SpeechSynthesisUtterance(rest);
+    utt.lang = 'zh-CN';
+    utt.rate = S.rate;
+    const v = pickVoice();
+    if (v) { utt.voice = v; utt.lang = v.lang || 'zh-CN'; }
+    S.speaking = utt;
+
+    let sawBoundary = false;
+    let timer = 0;
+    let t0 = 0;
+
+    utt.onstart = () => {
+      t0 = performance.now();
+      timer = setInterval(() => {
+        if (sawBoundary || gen !== S.gen) return;
+        const cps = 5.0 * S.rate;
+        const n = Math.floor((performance.now() - t0) / 1000 * cps);
+        const off = Math.min(fromChar + n, u.text.length - 1);
+        S.char = off;
+        highlightAt(i, off);
+      }, 110);
+    };
+    utt.onboundary = (ev) => {
+      if (!sawBoundary) { sawBoundary = true; clearInterval(timer); }
+      if (ev.name && ev.name !== 'word') return;
+      if (gen !== S.gen) return;
+      S.char = fromChar + ev.charIndex;
+      highlightAt(i, S.char);
+    };
+    utt.onend = () => { clearInterval(timer); S.speaking = null; resolve(gen === S.gen ? 'ended' : 'aborted'); };
+    utt.onerror = (ev) => {
+      clearInterval(timer);
+      S.speaking = null;
+      resolve('error:' + (ev.error || 'speech'));
+    };
+    try { synth.speak(utt); } catch (e) { resolve('error:' + e.message); }
+  });
+}
+
+/* ============================================================
+   Kokoro（OpenRouter）
+   ============================================================ */
+const VOICE_GROUPS = [
+  ['中文 · 女声', ['zf_xiaobei', 'zf_xiaoni', 'zf_xiaoxiao', 'zf_xiaoyi']],
+  ['中文 · 男声', ['zm_yunjian', 'zm_yunxi', 'zm_yunxia', 'zm_yunyang']],
+  ['English US · 女声', ['af_alloy', 'af_aoede', 'af_bella', 'af_heart', 'af_jessica', 'af_kore', 'af_nicole', 'af_nova', 'af_river', 'af_sarah', 'af_sky']],
+  ['English US · 男声', ['am_adam', 'am_echo', 'am_eric', 'am_fenrir', 'am_liam', 'am_michael', 'am_onyx', 'am_puck', 'am_santa']],
+  ['English UK · 女声', ['bf_alice', 'bf_emma', 'bf_isabella', 'bf_lily']],
+  ['English UK · 男声', ['bm_daniel', 'bm_fable', 'bm_george', 'bm_lewis']],
+  ['Español', ['ef_dora', 'em_alex', 'em_santa']],
+  ['Français', ['ff_siwis']],
+  ['हिन्दी', ['hf_alpha', 'hf_beta', 'hm_omega', 'hm_psi']],
+  ['Italiano', ['if_sara', 'im_nicola']],
+  ['日本語', ['jf_alpha', 'jf_gongitsune', 'jf_nezumi', 'jf_tebukuro', 'jm_kumo']],
+  ['Português', ['pf_dora', 'pm_alex', 'pm_santa']]
+];
+const ZH_VOICES = ['zf_xiaobei', 'zf_xiaoni', 'zf_xiaoxiao', 'zf_xiaoyi', 'zm_yunjian', 'zm_yunxi', 'zm_yunxia', 'zm_yunyang'];
+
+const cache = new Map();
+
+function apiKey() {
+  return ($('key').value || '').trim() || lsGet('prh.key') || '';
+}
+function endpoint() {
+  let v = ($('endpoint').value || '').trim() || 'https://openrouter.ai/api/v1';
+  if (!/^https?:\/\//i.test(v)) v = 'https://' + v.replace(/^\/+/, '');
+  return v.replace(/\/+$/, '');
+}
+function modelId() {
+  return ($('model').value || 'hexgrad/kokoro-82m').trim();
+}
+
+async function describeError(res) {
+  const hint = {
+    400: '请求参数不被支持', 401: 'API Key 无效或缺失', 402: 'OpenRouter 余额不足',
+    403: 'Key 被禁用、超额或无权访问', 404: '模型或路由不可用',
+    429: '触发限流，稍后再试', 502: '上游生成失败（不计费）'
+  }[res.status] || '';
+  let msg = '';
+  try {
+    const j = JSON.parse(await res.text());
+    if (j && j.error && j.error.message) msg = j.error.message;
+  } catch (e) { /* 不是 JSON */ }
+  return res.status + (hint ? ' · ' + hint : '') + (msg ? '：' + msg : '');
+}
+
+async function postSpeech(body) {
+  const key = apiKey();
+  if (!key) throw new Error('请先在 ⚙ 里填 OpenRouter API Key');
+  let res;
+  try {
+    res = await fetch(endpoint() + '/audio/speech', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+  } catch (e) {
+    const msg = (e && e.name ? e.name + ': ' : '') + (e && e.message ? e.message : '请求失败');
+    const err = new Error('请求没能发出去（' + msg + '）。点 ⚙ 里的「自检」看断在哪；也可以先把引擎切回「浏览器语音」正常读');
+    err.network = true;
+    throw err;
+  }
+  if (!res.ok) throw new Error(await describeError(res));
+  return res;
+}
+
+function pruneCache() {
+  if (cache.size <= 8) return;
+  for (const k of [...cache.keys()]) {
+    if (cache.size <= 8) break;
+    if (Math.abs(k - S.idx) <= 2) continue;
+    const e = cache.get(k);
+    try { URL.revokeObjectURL(e.url); } catch (x) {}
+    cache.delete(k);
+  }
+}
+
+async function fetchSpeech(i) {
+  if (cache.has(i)) return cache.get(i);
+  const voice = els.voice.value;
+  if (!voice) throw new Error('请先选择音色');
+  const res = await postSpeech({
+    model: modelId(),
+    input: units[i].text,
+    voice: voice,
+    response_format: 'mp3'
+  });
+  const ab = await res.arrayBuffer();
+  if (!ab.byteLength) throw new Error('接口返回了空音频');
+  const entry = {
+    url: URL.createObjectURL(new Blob([ab], { type: 'audio/mpeg' })),
+    id: res.headers.get('X-Generation-Id') || '',
+    an: null,
+    analysis: null
+  };
+  // 预取时就把音频解出来分析，播放时直接用
+  entry.analysis = decodeAndAnalyze(ab).then(function (an) { entry.an = an; return an; });
+  cache.set(i, entry);
+  pruneCache();
+  return entry;
+}
+
+/* 每个词的“发音份量”：中文 1，拉丁字母 0.55，标点带停顿 */
+function weightOf(s) {
+  let w = 0;
+  for (const ch of s) {
+    if (/[\u3400-\u4dbf\u4e00-\u9fff]/.test(ch)) w += 1;
+    else if (/[A-Za-z0-9]/.test(ch)) w += 0.55;
+    else if (/[，、；：,;]/.test(ch)) w += 1.8;
+    else if (/[。！？!?]/.test(ch)) w += 2.6;
+    else if (/[…—]/.test(ch)) w += 1.4;
+    else if (/\s/.test(ch)) w += 0.2;
+    else w += 0.6;
+  }
+  return Math.max(0.4, w);
+}
+
+function weightsOf(u) {
+  if (u.w) return u.w;
+  const list = [];
+  let total = 0;
+  for (const t of u.tokens) {
+    const w = weightOf(t.el.textContent);
+    list.push(w);
+    total += w;
+  }
+  u.w = { list: list, total: total || 1 };
+  return u.w;
+}
+
+/* 把音频时长按权重摊开：times[k] 是第 k 个词开始发声的时刻 */
+function schedule(u, dur) {
+  const W = weightsOf(u);
+  const lead = Math.min(0.12, dur * 0.04);
+  const tail = Math.min(0.16, dur * 0.05);
+  const usable = Math.max(0.08, dur - lead - tail);
+  const per = usable / W.total;
+  const times = [];
+  let acc = 0;
+  for (let i = 0; i < W.list.length; i++) {
+    times.push(lead + acc * per);
+    acc += W.list[i];
+  }
+  return { times: times, per: per, lead: lead, tail: tail };
+}
+
+/* ---------- 解码音频：用 RMS 包络找出发声段与停顿 ---------- */
+let audioCtx = null;
+function getAudioCtx() {
+  try {
+    if (!audioCtx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      audioCtx = new AC();
+    }
+    if (audioCtx.state === 'suspended' && audioCtx.resume) audioCtx.resume();
+    return audioCtx;
+  } catch (e) { return null; }
+}
+
+function decodeAndAnalyze(ab) {
+  const ctx = getAudioCtx();
+  if (!ctx) return Promise.resolve(null);
+  return new Promise(function (resolve) {
+    let settled = false;
+    const done = function (buf) {
+      if (settled) return;
+      settled = true;
+      try { resolve(analyzeBuffer(buf)); } catch (e) { resolve(null); }
+    };
+    try {
+      const p = ctx.decodeAudioData(ab.slice(0), done, function () { done(null); });
+      if (p && typeof p.then === 'function') p.then(done).catch(function () { done(null); });
+    } catch (e) { done(null); }
+  });
+}
+
+function analyzeBuffer(buf) {
+  if (!buf || !buf.length) return null;
+  const sr = buf.sampleRate;
+  const channels = Math.min(2, buf.numberOfChannels);
+  const data = [];
+  for (let c = 0; c < channels; c++) data.push(buf.getChannelData(c));
+
+  const HOP = 0.01;
+  const hop = Math.max(1, Math.round(sr * HOP));
+  const n = Math.floor(buf.length / hop);
+  const rms = new Float32Array(n);
+  let peak = 0;
+  for (let i = 0; i < n; i++) {
+    let sum = 0;
+    const base = i * hop;
+    for (let j = 0; j < hop; j++) {
+      let v = 0;
+      for (let c = 0; c < data.length; c++) v += data[c][base + j] || 0;
+      v /= data.length;
+      sum += v * v;
+    }
+    rms[i] = Math.sqrt(sum / hop);
+    if (rms[i] > peak) peak = rms[i];
+  }
+  if (peak <= 1e-5) return null;
+
+  const thr = Math.max(peak * 0.045, peak * 0.012 + 0.0015);
+  const segs = [];
+  let start = -1;
+  for (let i = 0; i < n; i++) {
+    const loud = rms[i] > thr;
+    if (loud && start < 0) start = i;
+    if (!loud && start >= 0) { segs.push([start * HOP, i * HOP]); start = -1; }
+  }
+  if (start >= 0) segs.push([start * HOP, n * HOP]);
+
+  // 合并 40ms 以内的碎缝，丢掉 60ms 以内的碎片
+  const merged = [];
+  for (const s of segs) {
+    const last = merged[merged.length - 1];
+    if (last && s[0] - last[1] < 0.04) last[1] = s[1];
+    else merged.push([s[0], s[1]]);
+  }
+  const speech = merged.filter(function (s) { return s[1] - s[0] >= 0.06; });
+  if (!speech.length) return null;
+
+  const gaps = [];
+  for (let i = 1; i < speech.length; i++) {
+    const a = speech[i - 1][1], b = speech[i][0];
+    if (b - a >= 0.08) gaps.push({ t: (a + b) / 2, len: b - a });
+  }
+  return {
+    dur: buf.duration,
+    segs: speech,
+    gaps: gaps,
+    start: speech[0][0],
+    end: speech[speech.length - 1][1]
+  };
+}
+
+/* ---------- 把标点停顿对齐到真实静音，再在段落内按权重分配 ---------- */
+function planFor(u, an) {
+  const W = weightsOf(u);
+  const total = W.total;
+  const cum = [], cumEnd = [];
+  let acc = 0;
+  for (const w of W.list) { cum.push(acc); acc += w; cumEnd.push(acc); }
+
+  const start = an.start, end = an.end;
+  const span = Math.max(0.05, end - start);
+
+  const punct = [];
+  u.tokens.forEach(function (t, i) {
+    if (/[，、；：,;。！？!?…—]$/.test(t.el.textContent)) punct.push(i);
+  });
+
+  // 长句子按比例估的位置误差更大，容差随时长缩放
+  const tol = Math.min(0.42, Math.max(0.18, span * 0.12));
+  const anchors = [{ w: 0, t: start }];
+  let gi = 0;
+  for (let k = 0; k < punct.length; k++) {
+    const pred = start + (cumEnd[punct[k]] / total) * span;
+    let best = -1, bestD = 1e9;
+    for (let g = gi; g < an.gaps.length; g++) {
+      const d = Math.abs(an.gaps[g].t - pred);
+      if (d < bestD) { bestD = d; best = g; }
+      if (an.gaps[g].t - pred > tol + 0.15) break;
+    }
+    if (best >= 0 && bestD <= tol) {
+      anchors.push({ w: cumEnd[punct[k]], t: an.gaps[best].t });
+      gi = best + 1;
+    }
+  }
+  anchors.push({ w: total, t: end });
+
+  const times = new Array(u.tokens.length);
+  let a = 0;
+  for (let i = 0; i < u.tokens.length; i++) {
+    while (a < anchors.length - 2 && anchors[a + 1].w <= cum[i]) a++;
+    const A = anchors[a];
+    const B = anchors[Math.min(a + 1, anchors.length - 1)];
+    const dw = Math.max(1e-6, B.w - A.w);
+    const r = Math.max(0, Math.min(1, (cum[i] - A.w) / dw));
+    times[i] = A.t + r * (B.t - A.t);
+  }
+  for (let i = 1; i < times.length; i++) {
+    if (times[i] < times[i - 1]) times[i] = times[i - 1] + 0.001;
+  }
+  return { times: times, anchors: anchors, segs: an.segs, used: anchors.length > 2 };
+}
+
+function tokenIndexAtChar(u, off) {
+  for (let k = 0; k < u.tokens.length; k++) {
+    if (u.tokens[k].s <= off && off < u.tokens[k].e) return k;
+  }
+  return 0;
+}
+
+async function cloudPlay(i, fromChar, gen) {
+  let entry;
+  try {
+    entry = await fetchSpeech(i);
+  } catch (e) {
+    return 'error:' + e.message;
+  }
+  if (gen !== S.gen) return 'aborted';
+
+  while (S.paused && gen === S.gen) await sleep(120);
+  if (gen !== S.gen) return 'aborted';
+
+  const u = units[i];
+  const audio = new Audio(entry.url);
+  audio.preload = 'auto';
+  audio.playbackRate = S.rate;
+  S.audio = audio;
+
+  if (!isFinite(audio.duration) || audio.duration <= 0) {
+    await new Promise((resolve) => {
+      const done = () => resolve();
+      audio.addEventListener('loadedmetadata', done, { once: true });
+      audio.addEventListener('error', done, { once: true });
+      setTimeout(done, 3000);
+    });
+  }
+  if (gen !== S.gen) return 'aborted';
+  while (S.paused && gen === S.gen) await sleep(120);
+  if (gen !== S.gen) return 'aborted';
+
+  const dur = (isFinite(audio.duration) && audio.duration > 0) ? audio.duration : u.text.length / 4.6;
+
+  let an = entry.an;
+  if (!an && entry.analysis) {
+    an = await Promise.race([entry.analysis, sleep(2500).then(function () { return null; })]);
+  }
+
+  let sch = null;
+  if (an && an.segs && an.segs.length) {
+    try { sch = planFor(u, an); } catch (e) { sch = null; }
+    if (sch && an.dur > 0 && dur > 0) {
+      // 解码时长与音频元素时长可能有几十毫秒的编码器填充差异，按比例贴合
+      const k = dur / an.dur;
+      if (k > 0.9 && k < 1.1 && Math.abs(1 - k) > 0.002) {
+        sch.times = sch.times.map(function (t) { return t * k; });
+      }
+    }
+  }
+  if (!sch) sch = schedule(u, dur);
+
+  const k0 = fromChar > 0 ? tokenIndexAtChar(u, fromChar) : 0;
+  if (fromChar > 0) audio.currentTime = Math.max(0, sch.times[k0]);
+
+  let ptr = k0, timer = 0;
+
+  // 用定时器而不是 rAF：后台标签页、无渲染节奏时 rAF 会停，高亮就冻住了
+  const tick = () => {
+    if (gen !== S.gen) { clearInterval(timer); return; }
+    const t = audio.currentTime + S.sync;
+    if (t >= sch.times[ptr]) {
+      while (ptr + 1 < sch.times.length && sch.times[ptr + 1] <= t) ptr++;
+      while (ptr > 0 && sch.times[ptr] > t) ptr--;
+      if (ptr !== u.cur) highlightToken(u, ptr);
+    }
+  };
+
+  return new Promise((resolve) => {
+    audio.onended = () => { clearInterval(timer); S.audio = null; resolve(gen === S.gen ? 'ended' : 'aborted'); };
+    audio.onerror = () => { clearInterval(timer); S.audio = null; resolve('error:音频播放失败'); };
+    audio.play().then(() => { timer = setInterval(tick, 60); tick(); })
+      .catch((err) => {
+        clearInterval(timer);
+        S.audio = null;
+        resolve('error:' + (err && err.message ? err.message : '播放被拦截，请再点一次播放'));
+      });
+  });
+}
+
+function prefetch(i) {
+  if (S.engine !== 'cloud') return;
+  if (i < 0 || i >= units.length || cache.has(i)) return;
+  fetchSpeech(i).catch(function () {});
+}
+
+/* ============================================================
+   播放循环
+   ============================================================ */
+async function loop(fromIdx, fromChar) {
+  const gen = ++S.gen;
+  S.playing = true;
+  S.paused = false;
+  S.finished = false;
+  ui();
+
+  for (let i = fromIdx; i < units.length; i++) {
+    if (gen !== S.gen) return;
+    S.idx = i;
+    setCurrent(i, {});
+    prefetch(i + 1);
+    prefetch(i + 2);
+
+    const startChar = (i === fromIdx) ? (fromChar || 0) : 0;
+    let r;
+    if (S.engine === 'cloud') {
+      els.st.textContent = (i + 1) + ' / ' + units.length + ' · 生成中';
+      r = await cloudPlay(i, startChar, gen);
+    } else {
+      r = await browserPlay(i, startChar, gen);
+    }
+    if (gen !== S.gen) return;
+    if (r !== 'ended') {
+      if (typeof r === 'string' && r.indexOf('error:') === 0) {
+        S.playing = false;
+        S.paused = false;
+        ui();
+        toast(r.slice(6), true);
+        if (/Key|401|余额|402|音色|请求没能发出去|自检/i.test(r)) openPanel(true);
+        return;
+      }
+      return;
+    }
+    els.st.textContent = (i + 1) + ' / ' + units.length;
+  }
+
+  S.playing = false;
+  S.paused = false;
+  S.finished = true;
+  ui();
+  els.st.textContent = '读完了 · 空格重播';
+}
+
+function stopAll() {
+  S.gen++;
+  if (synth) { try { synth.cancel(); } catch (e) {} }
+  S.speaking = null;
+  if (S.audio) { try { S.audio.pause(); } catch (e) {} S.audio = null; }
+  S.paused = false;
+  S.playing = false;
+  ui();
+}
+
+function pause() {
+  if (!S.playing || S.paused) return;
+  S.paused = true;
+  if (S.engine === 'cloud' && S.audio) {
+    try { S.audio.pause(); } catch (e) {}
+  } else {
+    S.resumeChar = S.char;
+    S.gen++;
+    if (synth) { try { synth.cancel(); } catch (e) {} }
+  }
+  ui();
+}
+
+function resume() {
+  if (!S.playing || !S.paused) return;
+  if (S.engine === 'cloud' && S.audio) {
+    S.paused = false;
+    S.audio.play().catch(function () { toast('继续播放失败，请再点一次', true); });
+    ui();
+  } else {
+    S.paused = false;
+    loop(S.idx, S.resumeChar);
+  }
+}
+
+function toggle() {
+  if (!S.playing) { loop(S.finished ? 0 : S.idx, 0); return; }
+  if (S.paused) resume(); else pause();
+}
+
+function jumpTo(i, char) {
+  i = Math.max(0, Math.min(units.length - 1, i));
+  stopAll();
+  S.idx = i;
+  S.char = char || 0;
+  setCurrent(i, {});
+  highlightAt(i, S.char);
+  loop(i, char || 0);
+}
+
+/* ============================================================
+   音色列表
+   ============================================================ */
+function fillCloudVoices() {
+  els.voice.innerHTML = '';
+  VOICE_GROUPS.forEach(function (pair) {
+    const g = document.createElement('optgroup');
+    g.label = pair[0];
+    pair[1].forEach(function (id) {
+      const o = document.createElement('option');
+      o.value = id;
+      o.textContent = id + (id === 'zf_xiaoxiao' ? ' · 推荐' : '');
+      g.appendChild(o);
+    });
+    els.voice.appendChild(g);
+  });
+  const saved = lsGet('prh.voice.cloud');
+  const all = VOICE_GROUPS.reduce(function (a, p) { return a.concat(p[1]); }, []);
+  els.voice.value = (saved && all.indexOf(saved) >= 0) ? saved : 'zf_xiaoxiao';
+}
+
+function loadBrowserVoices() {
+  if (!synth) { els.voice.innerHTML = '<option value="">（无可用声音）</option>'; return; }
+  const all = synth.getVoices();
+  const zh = all.filter(function (v) { return /^zh/i.test(v.lang); });
+  const list = zh.length ? zh : all;
+  voices = list;
+  els.voice.innerHTML = '';
+  if (!list.length) { els.voice.innerHTML = '<option value="">（无可用声音）</option>'; return; }
+  list.forEach(function (v) {
+    const o = document.createElement('option');
+    o.value = v.voiceURI;
+    o.textContent = v.name + ' · ' + v.lang;
+    els.voice.appendChild(o);
+  });
+  const saved = lsGet('prh.voice.browser');
+  if (saved && list.some(function (v) { return v.voiceURI === saved; })) els.voice.value = saved;
+}
+
+function loadVoicesForEngine() {
+  if (S.engine === 'cloud') fillCloudVoices();
+  else loadBrowserVoices();
+}
+
+function switchEngine() {
+  stopAll();
+  S.engine = els.engine.value;
+  lsSet('prh.engine', S.engine);
+  loadVoicesForEngine();
+  refreshKeyState();
+if (S.engine === 'cloud' && !apiKey()) openPanel(true);
+  ui();
+}
+
+/* ============================================================
+   设置面板
+   ============================================================ */
+function openPanel(focusKey) {
+  els.panel.hidden = false;
+  if (focusKey) $('key').focus();
+  else els.panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+function persist() {
+  lsSet('prh.model', $('model').value);
+  lsSet('prh.endpoint', $('endpoint').value);
+  lsSet('prh.sync', String(S.sync));
+  lsSet('prh.voice.' + S.engine, els.voice.value);
+  if ($('remember').checked) lsSet('prh.key', ($('key').value || '').trim());
+}
+
+/* ============================================================
+   事件
+   ============================================================ */
+let dragging = false;
+
+els.play.addEventListener('click', toggle);
+els.prev.addEventListener('click', function () { jumpTo(S.idx - 1, 0); });
+els.next.addEventListener('click', function () { jumpTo(S.idx + 1, 0); });
+
+els.prog.addEventListener('pointerdown', function () { dragging = true; });
+window.addEventListener('pointerup', function () { dragging = false; });
+els.prog.addEventListener('change', function () { jumpTo(Number(els.prog.value) - 1, 0); });
+
+els.rate.addEventListener('input', function () {
+  S.rate = Number(els.rate.value);
+  els.rv.textContent = S.rate.toFixed(1) + '×';
+  lsSet('prh.rate', String(S.rate));
+  if (S.audio) S.audio.playbackRate = S.rate;
+  if (S.playing && S.engine === 'browser') {
+    S.resumeChar = S.char;
+    S.gen++;
+    if (synth) synth.cancel();
+    loop(S.idx, S.resumeChar);
+  }
+});
+
+els.engine.addEventListener('change', switchEngine);
+els.voice.addEventListener('change', function () {
+  lsSet('prh.voice.' + S.engine, els.voice.value);
+  if (S.playing) jumpTo(S.idx, S.char);
+});
+
+els.gear.addEventListener('click', function () {
+  els.panel.hidden = !els.panel.hidden;
+  if (!els.panel.hidden) $('key').focus();
+});
+
+$('clear').addEventListener('click', function () {
+  $('key').value = '';
+  lsDel('prh.key');
+  $('remember').checked = false;
+  refreshKeyState();
+  toast('已清除本机保存的 Key');
+});
+
+async function diagnose() {
+  const box = $('diagLog');
+  box.hidden = false;
+  const lines = [];
+  const push = (t) => { lines.push(t); box.textContent = lines.join('\n'); };
+  const base = endpoint();
+  push('时间：' + new Date().toLocaleTimeString());
+  push('页面：' + location.href.replace(/[?#].*$/, ''));
+  push('协议：' + location.protocol + ' · 浏览器在线：' + (navigator.onLine ? '是' : '否'));
+  push('地址：' + base + '/audio/speech');
+  try {
+    const host = new URL(base).host;
+    if (host !== 'openrouter.ai') push('注意：当前用的是非默认域名 ' + host + '，确认是你自己的中转');
+  } catch (e) { push('注意：「接口地址」不是合法的 URL：' + base); }
+  push('Key：' + (apiKey() ? '已填写（' + apiKey().slice(0, 6) + '…' + apiKey().slice(-4) + '）' : '未填写'));
+  push('');
+
+  // 1) 是否能连到这个域名（公开接口，不需要 Key）
+  let reachable = false;
+  try {
+    const t0 = performance.now();
+    const r = await fetch(base + '/models', { method: 'GET' });
+    reachable = true;
+    push('① GET /models → HTTP ' + r.status + '（' + Math.round(performance.now() - t0) + ' ms）');
+    if (!r.ok) push('   域名能连上，但接口返回非 200，检查「接口地址」是否写多了/少了路径');
+  } catch (e) {
+    push('① GET /models → 失败：' + (e.name || 'Error') + (e.message ? ' / ' + e.message : ''));
+    push('   说明浏览器根本连不到 ' + base);
+    push('   → 换网络 / 开代理 / 把「接口地址」改成你的中转地址；页面本身无法绕过网络封锁');
+  }
+
+  if (!reachable) { push(''); push('后面的检查先跳过（域名不通时没有意义）'); return; }
+
+  // 2) Key 是否有效
+  if (!apiKey()) { push('② GET /key → 跳过：没有填 Key'); }
+  else {
+    try {
+      const r = await fetch(base + '/key', { headers: { 'Authorization': 'Bearer ' + apiKey() } });
+      if (r.ok) {
+        const j = await r.json();
+        const d = (j && j.data) || {};
+        push('② GET /key → 有效' + (d.limit_remaining != null ? '，剩余额度 ' + d.limit_remaining : '') + (d.is_free_tier ? '（free tier）' : ''));
+      } else {
+        const t = await r.text();
+        push('② GET /key → HTTP ' + r.status + '：' + t.slice(0, 140).replace(/\s+/g, ' '));
+      }
+    } catch (e) {
+      push('② GET /key → 失败：' + (e.name || 'Error') + ' / ' + (e.message || ''));
+    }
+  }
+
+  // 3) 真的合成一句（会消耗几个字符）
+  try {
+    const t0 = performance.now();
+    const r = await fetch(base + '/audio/speech', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + apiKey(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: modelId(), input: '测试', voice: els.voice.value || 'zf_xiaoxiao', response_format: 'mp3' })
+    });
+    const ct = r.headers.get('Content-Type') || '';
+    push('③ POST /audio/speech → HTTP ' + r.status + '（' + Math.round(performance.now() - t0) + ' ms，' + ct + '）');
+    if (r.ok && /audio/.test(ct)) {
+      const b = await r.blob();
+      push('   收到音频 ' + b.size + ' 字节 → 链路正常');
+      if (b.size) {
+        const a = new Audio(URL.createObjectURL(b));
+        a.play().catch(function () {});
+      }
+    } else if (r.ok) {
+      push('   返回的不是音频（Content-Type 不对），检查「模型」是否 hexgrad/kokoro-82m');
+    } else {
+      push('   ' + (await r.text()).slice(0, 160).replace(/\s+/g, ' '));
+    }
+  } catch (e) {
+    push('③ POST /audio/speech → 失败：' + (e.name || 'Error') + ' / ' + (e.message || ''));
+  }
+}
+
+$('test').addEventListener('click', async function () {
+  if (!apiKey()) { toast('先填 OpenRouter API Key', true); return; }
+  if (S.engine !== 'cloud') { S.engine = 'cloud'; els.engine.value = 'cloud'; loadVoicesForEngine(); ui(); }
+  stopAll();
+  try {
+    const res = await postSpeech({
+      model: modelId(),
+      input: '你好，这是语音测试。好视图，是通向柏拉图表示的关键杠杆。',
+      voice: els.voice.value,
+      response_format: 'mp3'
+    });
+    const blob = await res.blob();
+    const a = new Audio(URL.createObjectURL(blob));
+    a.play().catch(function () { toast('播放失败', true); });
+    toast('正在试听 · ' + els.voice.value);
+  } catch (e) {
+    toast('试听失败：' + e.message, true);
+  }
+});
+
+$('diag').addEventListener('click', function () { diagnose(); });
+
+$('model').addEventListener('change', persist);
+$('endpoint').addEventListener('change', persist);
+
+$('sync').addEventListener('input', function () {
+  S.sync = Number($('sync').value);
+  $('syncv').textContent = S.sync.toFixed(2) + ' s';
+  lsSet('prh.sync', String(S.sync));
+});
+
+$('remember').addEventListener('change', function () {
+  if (!$('remember').checked) lsDel('prh.key');
+  else persist();
+});
+function refreshKeyState() {
+  $('keyState').textContent = apiKey() ? 'Key 已填写' : '未填写 Key';
+}
+$('key').addEventListener('input', refreshKeyState);
+$('key').addEventListener('change', function () {
+  refreshKeyState();
+  if ($('remember').checked) persist();
+});
+
+els.tpy.addEventListener('change', function () {
+  document.body.classList.toggle('nopy', !els.tpy.checked);
+  lsSet('prh.pinyin', els.tpy.checked ? '1' : '0');
+});
+els.ten.addEventListener('change', function () {
+  document.body.classList.toggle('en', els.ten.checked);
+  lsSet('prh.en', els.ten.checked ? '1' : '0');
+});
+
+docEl.addEventListener('click', function (e) {
+  const sent = e.target.closest('.s');
+  if (!sent) return;
+  const i = Number(sent.dataset.i);
+  const w = e.target.closest('.w');
+  jumpTo(i, w ? Number(w.dataset.s) : 0);
+});
+
+function nudge(delta) {
+  S.sync = Math.round(Math.max(-0.6, Math.min(0.6, S.sync + delta)) * 100) / 100;
+  $('sync').value = String(S.sync);
+  $('syncv').textContent = S.sync.toFixed(2) + ' s';
+  lsSet('prh.sync', String(S.sync));
+  toast('对时偏移 ' + (S.sync > 0 ? '+' : '') + S.sync.toFixed(2) + ' s');
+}
+
+document.addEventListener('keydown', function (e) {
+  const t = (e.target.tagName || '').toUpperCase();
+  const typing = t === 'INPUT' || t === 'SELECT' || t === 'TEXTAREA';
+  if (t === 'INPUT' || t === 'TEXTAREA') return;
+  if (e.code === 'Space') {
+    if (typing) e.target.blur();
+    e.preventDefault();
+    toggle();
+  } else if (e.code === 'ArrowRight' && !typing) {
+    e.preventDefault(); jumpTo(S.idx + 1, 0);
+  } else if (e.code === 'ArrowLeft' && !typing) {
+    e.preventDefault(); jumpTo(S.idx - 1, 0);
+  } else if (e.key === '[') {
+    e.preventDefault(); nudge(-0.05);
+  } else if (e.key === ']') {
+    e.preventDefault(); nudge(0.05);
+  } else if (e.code === 'Escape') {
+    els.panel.hidden = true;
+  }
+}, { passive: false });
+
+window.addEventListener('beforeunload', function () { if (synth) { try { synth.cancel(); } catch (e) {} } });
+
+/* ============================================================
+   启动
+   ============================================================ */
+try {
+  render();
+} catch (err) {
+  docEl.textContent = '文章渲染失败：' + err.message;
+  throw err;
+}
+
+$('nUnits').textContent = String(units.length);
+els.prog.max = String(units.length);
+
+try {
+  const savedRate = Number(lsGet('prh.rate'));
+  if (savedRate >= 0.5 && savedRate <= 2) { S.rate = savedRate; els.rate.value = String(savedRate); }
+  els.rv.textContent = S.rate.toFixed(1) + '×';
+
+  const model = lsGet('prh.model');
+  if (model) $('model').value = model;
+  const ep = lsGet('prh.endpoint');
+  if (ep) $('endpoint').value = ep;
+  const key = lsGet('prh.key');
+  if (key) { $('key').value = key; $('remember').checked = true; $('keyState').textContent = '已保存 Key'; }
+
+  const sync = Number(lsGet('prh.sync'));
+  if (sync >= -0.6 && sync <= 0.6) {
+    S.sync = sync;
+    $('sync').value = String(sync);
+    $('syncv').textContent = sync.toFixed(2) + ' s';
+  }
+
+  if (lsGet('prh.pinyin') === '0') { els.tpy.checked = false; document.body.classList.add('nopy'); }
+  if (lsGet('prh.en') === '1') { els.ten.checked = true; document.body.classList.add('en'); }
+
+  const engine = lsGet('prh.engine');
+  if (engine === 'cloud' || engine === 'browser') els.engine.value = engine;
+} catch (e) {}
+
+S.engine = els.engine.value;
+if (!lsGet('prh.engine')) S.engine = (lsGet('prh.key') && lsGet('prh.key').trim()) ? 'cloud' : 'browser';
+els.engine.value = S.engine;
+loadVoicesForEngine();
+ui();
+
+const savedPos = Number(lsGet('prh.pos'));
+S.idx = (savedPos >= 0 && savedPos < units.length) ? savedPos : 0;
+setCurrent(S.idx, { scroll: false });
+highlightAt(S.idx, 0);
+if (S.idx > 0) {
+  setTimeout(function () {
+    const el = units[S.idx].el;
+    const y = window.scrollY + el.getBoundingClientRect().top - window.innerHeight * 0.42;
+    window.scrollTo({ top: Math.max(0, y) });
+  }, 60);
+}
+
+if (!synth && S.engine === 'browser') {
+  els.play.disabled = true;
+  toast('此浏览器不支持语音合成；可切到 Kokoro', true);
+} else if (synth) {
+  synth.addEventListener('voiceschanged', function () {
+    if (S.engine === 'browser') loadBrowserVoices();
+  });
+}
+
+refreshKeyState();
+if (S.engine === 'cloud' && !apiKey()) openPanel(true);
+
+/* 调试出口 */
+window.__reader = {
+  units: units, S: S, cache: cache, voices: VOICE_GROUPS, zhVoices: ZH_VOICES,
+  highlightToken: highlightToken, highlightAt: highlightAt,
+  weightOf: weightOf, weightsOf: weightsOf, schedule: schedule, segments: segments,
+  analyzeBuffer: analyzeBuffer, planFor: planFor, decodeAndAnalyze: decodeAndAnalyze,
+  diagnose: diagnose
+};
+})();
+</script>
+</body>
+</html>
