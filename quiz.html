@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>术语字卡与测验 · 柏拉图表示定理</title>
+<style>
+:root{
+  --bg:#fbfaf6; --fg:#1e1d1a; --mut:#7b7870; --bar:rgba(251,250,246,.92);
+  --bd:#e3dfd3; --panel:#f4f1e8; --ac:#9a3b17; --ok:#2f6b3f; --bad:#a3341f;
+  --okbg:rgba(47,107,63,.12); --badbg:rgba(163,52,31,.12); color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#161615; --fg:#e9e8e1; --mut:#9c9a90; --bar:rgba(22,22,21,.92);
+    --bd:#34332e; --panel:#1e1d1a; --ac:#e9a878; --ok:#8ed0a4; --bad:#f0a08a;
+    --okbg:rgba(142,208,164,.14); --badbg:rgba(240,160,138,.14); color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:16px/1.75 "PingFang SC","Noto Sans CJK SC","Microsoft YaHei",system-ui,sans-serif}
+header{position:sticky;top:0;z-index:10;background:var(--bar);border-bottom:1px solid var(--bd);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:10px 18px}
+header a{color:var(--ac);text-decoration:none;font-size:13px}
+header .sp{flex:1}
+.tabs{display:flex;gap:4px;background:var(--panel);border:1px solid var(--bd);border-radius:10px;padding:3px}
+.tabs button{border:0;background:transparent;color:var(--mut);font:inherit;font-size:13.5px;
+  padding:5px 14px;border-radius:8px;cursor:pointer}
+.tabs button.on{background:var(--bg);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+#stat{font-size:12.5px;color:var(--mut);font-variant-numeric:tabular-nums}
+main{max-width:760px;margin:0 auto;padding:26px 20px 70px}
+h1{font-size:20px;margin:0 0 6px}
+.sub{font-size:13px;color:var(--mut);margin:0 0 22px}
+.card{position:relative;background:var(--panel);border:1px solid var(--bd);border-radius:16px;
+  padding:34px 26px 26px;text-align:center;min-height:225px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:10px;cursor:pointer}
+.tag{position:absolute;top:12px;left:14px;font-size:11px;color:var(--bg);background:var(--ac);
+  border-radius:999px;padding:1px 9px;letter-spacing:.02em}
+.term{font-size:40px;line-height:1.3;letter-spacing:.02em}
+.py{font-size:20px;color:var(--ac);font-family:system-ui,sans-serif}
+.en{font-size:14px;color:var(--mut);font-family:system-ui,sans-serif}
+.gloss{font-size:15px;color:var(--fg);max-width:34em;line-height:1.9}
+.hidden{display:none}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px}
+button{font:inherit;font-size:14px;color:var(--fg);background:var(--bg);border:1px solid var(--bd);
+  border-radius:10px;padding:8px 16px;cursor:pointer;transition:border-color .15s,background .15s}
+button:hover{border-color:var(--ac)}
+button.primary{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:600}
+button.ghost{background:transparent}
+button:disabled{opacity:.45;cursor:not-allowed}
+#cardPos{font-size:12.5px;color:var(--mut);font-variant-numeric:tabular-nums;min-width:56px;text-align:center}
+.pos{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px}
+.pos button{padding:4px 10px;font-size:13px}
+.hintline{font-size:12.5px;color:var(--mut);margin-top:4px}
+.qhead{display:flex;align-items:center;gap:12px;margin:4px 0 18px}
+.qhead .bar{flex:1;height:6px;background:var(--panel);border:1px solid var(--bd);border-radius:99px;overflow:hidden}
+.qhead .bar i{display:block;height:100%;width:0;background:var(--ac);transition:width .25s}
+.prompt{background:var(--panel);border:1px solid var(--bd);border-radius:14px;padding:26px 22px;text-align:center;min-height:130px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.prompt .big{font-size:32px;line-height:1.35}
+.prompt .mid{font-size:22px;color:var(--ac);font-family:system-ui,sans-serif}
+.prompt .small{font-size:15px;color:var(--fg);max-width:30em;line-height:1.9}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+@media (max-width:560px){.opts{grid-template-columns:1fr}}
+.opt{display:flex;align-items:center;gap:10px;text-align:left;padding:12px 14px;border-radius:10px;line-height:1.6}
+.opt .n{flex:0 0 22px;height:22px;border-radius:6px;background:var(--panel);border:1px solid var(--bd);
+  display:inline-flex;align-items:center;justify-content:center;font-size:11.5px;color:var(--mut)}
+.opt.right{border-color:var(--ok);background:var(--okbg)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg)}
+.opt .mark{margin-left:auto;font-size:13px}
+.fb{margin-top:14px;font-size:13.5px;line-height:1.9;color:var(--mut);min-height:26px}
+.fb b{color:var(--fg)}
+#result h2{font-size:22px;margin:6px 0 4px}
+.big{font-size:34px;font-variant-numeric:tabular-nums}
+.miss{list-style:none;padding:0;margin:14px 0 0}
+.miss li{border:1px solid var(--bd);border-radius:10px;padding:10px 14px;margin-bottom:8px;background:var(--panel)}
+.miss .t{font-size:17px}
+.miss .p{color:var(--ac);font-size:13px;font-family:system-ui,sans-serif;margin-left:8px}
+.miss .g{display:block;font-size:13px;color:var(--mut);margin-top:2px}
+.speak{font-size:13.5px;padding:6px 12px}
+.foot{font-size:12px;color:var(--mut);text-align:center;margin-top:26px;line-height:1.9}
+</style>
+</head>
+<body>
+<header>
+  <a href="index.html">← 一页讲清</a>
+  <a href="reader.html">朗读版</a>
+  <div class="sp"></div>
+  <div class="tabs">
+    <button data-mode="cards" class="on">字卡</button>
+    <button data-mode="quiz">测验</button>
+  </div>
+  <span id="stat"></span>
+</header>
+
+<main>
+  <!-- 字卡 -->
+  <section id="cardsView">
+    <h1>术语字卡</h1>
+    <p class="sub">先看词，猜它的读音和意思；点卡片（或空格）翻面核对。🔊 可以听发音。</p>
+
+    <div class="card" id="flash" role="button" tabindex="0" aria-label="翻面">
+      <span class="tag" id="fTag">基础</span>
+      <div class="term" id="fTerm">模态</div>
+      <div class="py hidden" id="fPy">mótài</div>
+      <div class="en hidden" id="fEn">modality</div>
+      <div class="gloss hidden" id="fGloss">信息的种类</div>
+      <div class="hintline hidden" id="fHint">点卡片 / 空格 翻面</div>
+    </div>
+
+    <div class="row">
+      <button id="speakBtn" class="speak">🔊 听发音</button>
+      <button id="flip" class="primary">显示答案</button>
+      <button id="shuffle">🔀 打乱</button>
+    </div>
+    <div class="row">
+      <button id="know">✅ 记住了</button>
+      <button id="dunno">🔁 还不熟</button>
+    </div>
+    <div class="pos">
+      <button id="prevCard" class="ghost" title="上一个（←）">←</button>
+      <span id="cardPos">1 / 60</span>
+      <button id="nextCard" class="ghost" title="下一个（→）">→</button>
+    </div>
+  </section>
+
+  <!-- 测验 -->
+  <section id="quizView" hidden>
+    <div class="qhead">
+      <span id="qIdx" style="font-size:12.5px;color:var(--mut)">1 / 10</span>
+      <div class="bar"><i id="qBar"></i></div>
+      <span id="qScore" style="font-size:12.5px;color:var(--mut)">0 分</span>
+    </div>
+
+    <div class="prompt" id="qPrompt"></div>
+    <div class="opts" id="qOpts"></div>
+    <div class="fb" id="qFb"></div>
+
+    <div class="row">
+      <button id="qNext" class="primary" disabled>下一题</button>
+      <button id="qReplay" class="ghost speak" hidden>🔊 再听一遍</button>
+    </div>
+    <p class="sub" style="margin-top:16px">按 <b>1–4</b> 选答案，<b>回车</b> 进入下一题。</p>
+  </section>
+
+  <!-- 结果 -->
+  <section id="result" hidden>
+    <h2 id="rTitle">这一轮结束</h2>
+    <div class="big" id="rScore">0 / 10</div>
+    <p class="sub" id="rLine"></p>
+    <ul class="miss" id="rWrong"></ul>
+    <div class="row">
+      <button id="again" class="primary">再来一轮</button>
+      <button id="onlyWrong">只练错题</button>
+      <button id="toCards" class="ghost">回字卡</button>
+    </div>
+  </section>
+
+  <p class="foot">
+    60 个术语取自《柏拉图表示定理》一页讲清与朗读版的词表 · 进度只存在你自己的浏览器里<br>
+    <a href="#" id="reset" style="color:var(--mut)">重置进度</a>
+  </p>
+</main>
+
+<script>
+(function () {
+'use strict';
+
+const TERMS = [
+ {
+  "zh": "模态",
+  "py": "mótài",
+  "en": "modality",
+  "gloss": "信息的种类，比如文字、图像、声音",
+  "tag": "基础"
+ },
+ {
+  "zh": "收敛",
+  "py": "shōuliǎn",
+  "en": "converge",
+  "gloss": "不同的训练最后走到同一个结果",
+  "tag": "基础"
+ },
+ {
+  "zh": "世界表示",
+  "py": "shìjiè biǎoshì",
+  "en": "world representation",
+  "gloss": "模型心里对世界的内部描述",
+  "tag": "基础"
+ },
+ {
+  "zh": "视角",
+  "py": "shìjiǎo",
+  "en": "perspective",
+  "gloss": "同一个世界的另一种看法",
+  "tag": "基础"
+ },
+ {
+  "zh": "观测",
+  "py": "guāncè",
+  "en": "observation",
+  "gloss": "对世界的一次具体记录，照片和句子都算",
+  "tag": "基础"
+ },
+ {
+  "zh": "定理",
+  "py": "dìnglǐ",
+  "en": "theorem",
+  "gloss": "有条件、可证明的结论",
+  "tag": "基础"
+ },
+ {
+  "zh": "柏拉图表示定理",
+  "py": "Bólātú biǎoshì dìnglǐ",
+  "en": "Platonic Representation Theorem",
+  "gloss": "好视图训练出的表示只差一个旋转",
+  "tag": "基础"
+ },
+ {
+  "zh": "对齐",
+  "py": "duìqí",
+  "en": "alignment",
+  "gloss": "不同模态的表示落到同一个坐标系",
+  "tag": "基础"
+ },
+ {
+  "zh": "正样本对",
+  "py": "zhèng yàngběn duì",
+  "en": "positive pair",
+  "gloss": "被认为“说的是同一件事”的一对样本",
+  "tag": "视图"
+ },
+ {
+  "zh": "好视图",
+  "py": "hǎo shìtú",
+  "en": "good view",
+  "gloss": "同一场景的两个独立观测",
+  "tag": "视图"
+ },
+ {
+  "zh": "坏视图",
+  "py": "huài shìtú",
+  "en": "bad view",
+  "gloss": "同一个观测被切开的两半",
+  "tag": "视图"
+ },
+ {
+  "zh": "失配程度",
+  "py": "shīpèi chéngdù",
+  "en": "degree of mismatch",
+  "gloss": "两个模态的配对有多不一致",
+  "tag": "视图"
+ },
+ {
+  "zh": "有界",
+  "py": "yǒujiè",
+  "en": "bounded",
+  "gloss": "有上限，不会无限大",
+  "tag": "视图"
+ },
+ {
+  "zh": "上界",
+  "py": "shàngjiè",
+  "en": "upper bound",
+  "gloss": "误差不会超过的那条线",
+  "tag": "视图"
+ },
+ {
+  "zh": "覆盖范围",
+  "py": "fùgài fànwéi",
+  "en": "coverage",
+  "gloss": "正样本对把世界连得多全",
+  "tag": "视图"
+ },
+ {
+  "zh": "权衡",
+  "py": "quánhéng",
+  "en": "trade-off",
+  "gloss": "一边好了，另一边就得让",
+  "tag": "视图"
+ },
+ {
+  "zh": "干扰因素",
+  "py": "gānrǎo yīnsù",
+  "en": "nuisance factor",
+  "gloss": "与任务无关、却占掉表示容量的东西",
+  "tag": "视图"
+ },
+ {
+  "zh": "旋转",
+  "py": "xuánzhuǎn",
+  "en": "rotation",
+  "gloss": "换一套坐标轴，信息不变",
+  "tag": "数学"
+ },
+ {
+  "zh": "旋转矩阵",
+  "py": "xuánzhuǎn jǔzhèn",
+  "en": "rotation matrix",
+  "gloss": "用来换坐标的那个矩阵",
+  "tag": "数学"
+ },
+ {
+  "zh": "坐标轴",
+  "py": "zuòbiāozhóu",
+  "en": "axis",
+  "gloss": "描述方向的几条基准线",
+  "tag": "数学"
+ },
+ {
+  "zh": "谱 JEPA",
+  "py": "pǔ JEPA",
+  "en": "spectral JEPA",
+  "gloss": "表示就是图的前几个特征向量",
+  "tag": "数学"
+ },
+ {
+  "zh": "特征向量",
+  "py": "tèzhēng xiàngliàng",
+  "en": "eigenvector",
+  "gloss": "图的主要方向",
+  "tag": "数学"
+ },
+ {
+  "zh": "核",
+  "py": "hé",
+  "en": "kernel",
+  "gloss": "样本之间相似度的整体结构",
+  "tag": "数学"
+ },
+ {
+  "zh": "谱间隙",
+  "py": "pǔ jiànxì",
+  "en": "spectral gap",
+  "gloss": "主要方向和次要方向差多少",
+  "tag": "数学"
+ },
+ {
+  "zh": "单射渲染",
+  "py": "dānshè xuànrǎn",
+  "en": "injective rendering",
+  "gloss": "不同状态不会渲染成同一个观测",
+  "tag": "数学"
+ },
+ {
+  "zh": "均方根距离",
+  "py": "jūnfānggēn jùlí",
+  "en": "root-mean-square distance",
+  "gloss": "两组向量平均差多远",
+  "tag": "数学"
+ },
+ {
+  "zh": "联合嵌入预测架构",
+  "py": "liánhé qiànrù yùcè jiàgòu",
+  "en": "Joint-Embedding Predictive Architecture",
+  "gloss": "用表示预测表示，不预测像素或词",
+  "tag": "模型"
+ },
+ {
+  "zh": "预测项",
+  "py": "yùcè xiàng",
+  "en": "prediction term",
+  "gloss": "损失里负责“预测得准”的那一项",
+  "tag": "模型"
+ },
+ {
+  "zh": "防坍缩项",
+  "py": "fáng tānsuō xiàng",
+  "en": "anti-collapse term",
+  "gloss": "防止所有样本挤成一个点",
+  "tag": "模型"
+ },
+ {
+  "zh": "下一 token 预测",
+  "py": "xià yī token yùcè",
+  "en": "next-token prediction",
+  "gloss": "猜下一个词，语言模型的训练方式",
+  "tag": "模型"
+ },
+ {
+  "zh": "前缀",
+  "py": "qiánzhuì",
+  "en": "prefix",
+  "gloss": "文档前面的部分",
+  "tag": "模型"
+ },
+ {
+  "zh": "容量",
+  "py": "róngliàng",
+  "en": "capacity",
+  "gloss": "模型能装下多少信息",
+  "tag": "模型"
+ },
+ {
+  "zh": "规模",
+  "py": "guīmó",
+  "en": "scale",
+  "gloss": "模型的大小，通常看参数量",
+  "tag": "模型"
+ },
+ {
+  "zh": "参数",
+  "py": "cānshù",
+  "en": "parameter",
+  "gloss": "模型里可调的数字",
+  "tag": "模型"
+ },
+ {
+  "zh": "编码器",
+  "py": "biānmǎqì",
+  "en": "encoder",
+  "gloss": "把输入变成表示",
+  "tag": "模型"
+ },
+ {
+  "zh": "解码器",
+  "py": "jiěmǎqì",
+  "en": "decoder",
+  "gloss": "把表示变回文字",
+  "tag": "模型"
+ },
+ {
+  "zh": "冻结",
+  "py": "dòngjié",
+  "en": "frozen",
+  "gloss": "不训练，参数不动",
+  "tag": "模型"
+ },
+ {
+  "zh": "高斯噪声",
+  "py": "Gāosī zàoshēng",
+  "en": "Gaussian noise",
+  "gloss": "加一点随机扰动，换来容错",
+  "tag": "模型"
+ },
+ {
+  "zh": "残余对齐误差",
+  "py": "cányú duìqí wùchā",
+  "en": "residual alignment error",
+  "gloss": "旋转之后还剩的小误差",
+  "tag": "模型"
+ },
+ {
+  "zh": "语言模型",
+  "py": "yǔyán móxíng",
+  "en": "language model",
+  "gloss": "用大量文本训练出来的模型",
+  "tag": "模型"
+ },
+ {
+  "zh": "文本编码器",
+  "py": "wénběn biānmǎqì",
+  "en": "text encoder",
+  "gloss": "把文字变成表示的编码器",
+  "tag": "模型"
+ },
+ {
+  "zh": "视觉编码器",
+  "py": "shìjué biānmǎqì",
+  "en": "vision encoder",
+  "gloss": "把图像变成表示的编码器",
+  "tag": "模型"
+ },
+ {
+  "zh": "成对数据",
+  "py": "chéngduì shùjù",
+  "en": "paired data",
+  "gloss": "图像和描述一一对应",
+  "tag": "数据"
+ },
+ {
+  "zh": "无成对数据",
+  "py": "wú chéngduì shùjù",
+  "en": "unpaired data",
+  "gloss": "两边各自一堆，没有对应",
+  "tag": "数据"
+ },
+ {
+  "zh": "语料",
+  "py": "yǔliào",
+  "en": "corpus",
+  "gloss": "训练用的文本集合",
+  "tag": "数据"
+ },
+ {
+  "zh": "样本",
+  "py": "yàngběn",
+  "en": "sample",
+  "gloss": "一次训练用到的一个例子",
+  "tag": "数据"
+ },
+ {
+  "zh": "修剪",
+  "py": "xiūjiǎn",
+  "en": "pruning",
+  "gloss": "把不可靠的配对剔掉",
+  "tag": "数据"
+ },
+ {
+  "zh": "数据效率",
+  "py": "shùjù xiàolǜ",
+  "en": "data efficiency",
+  "gloss": "同样效果要多少数据",
+  "tag": "评测"
+ },
+ {
+  "zh": "零样本准确率",
+  "py": "líng yàngběn zhǔnquèlǜ",
+  "en": "zero-shot accuracy",
+  "gloss": "没见过的类别也能分类的准确率",
+  "tag": "评测"
+ },
+ {
+  "zh": "基准",
+  "py": "jīzhǔn",
+  "en": "benchmark",
+  "gloss": "大家共用的评测集",
+  "tag": "评测"
+ },
+ {
+  "zh": "基线",
+  "py": "jīxiàn",
+  "en": "baseline",
+  "gloss": "拿来对比的旧方法",
+  "tag": "评测"
+ },
+ {
+  "zh": "检索",
+  "py": "jiǎnsuǒ",
+  "en": "retrieval",
+  "gloss": "用一边去另一边找",
+  "tag": "评测"
+ },
+ {
+  "zh": "互最近邻",
+  "py": "hù zuìjìnlín",
+  "en": "mutual nearest neighbors",
+  "gloss": "你是我最近的，我也是你最近的",
+  "tag": "评测"
+ },
+ {
+  "zh": "线性 CKA",
+  "py": "xiànxìng CKA",
+  "en": "linear centered kernel alignment",
+  "gloss": "比较两个表示有多像的指标",
+  "tag": "评测"
+ },
+ {
+  "zh": "缩放定律",
+  "py": "suōfàng dìnglǜ",
+  "en": "scaling law",
+  "gloss": "规模变大，效果按规律变化",
+  "tag": "评测"
+ },
+ {
+  "zh": "种子噪声",
+  "py": "zhǒngzi zàoshēng",
+  "en": "seed noise",
+  "gloss": "换随机种子带来的波动",
+  "tag": "评测"
+ },
+ {
+  "zh": "种子波动",
+  "py": "zhǒngzi bōdòng",
+  "en": "seed variance",
+  "gloss": "同上，指波动的幅度",
+  "tag": "评测"
+ },
+ {
+  "zh": "召回率",
+  "py": "zhàohuílǜ",
+  "en": "recall",
+  "gloss": "该找出来的找回了多少",
+  "tag": "评测"
+ },
+ {
+  "zh": "图像描述",
+  "py": "túxiàng miáoshù",
+  "en": "image caption",
+  "gloss": "一句话说明图里有什么",
+  "tag": "应用"
+ },
+ {
+  "zh": "图像描述器",
+  "py": "túxiàng miáoshùqì",
+  "en": "image captioner",
+  "gloss": "能给图像写描述的模型",
+  "tag": "应用"
+ }
+];
+
+const $ = (id) => document.getElementById(id);
+const KEY = 'prh.quiz.v1';
+let stats = {};
+try { stats = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { stats = {}; }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(stats)); } catch (e) {} }
+function bump(zh, ok) {
+  const s = stats[zh] || (stats[zh] = { r: 0, w: 0 });
+  if (ok) s.r++; else s.w++;
+  save();
+  updateStat();
+}
+function mastered() { return TERMS.filter((t) => { const s = stats[t.zh]; return s && s.r - s.w >= 2; }).length; }
+function updateStat() { $('stat').textContent = '熟练 ' + mastered() + ' / ' + TERMS.length; }
+
+/* ---------- 发音 ---------- */
+const synth = window.speechSynthesis || null;
+let zhVoice = null;
+function pickVoice() {
+  if (!synth) return null;
+  const vs = synth.getVoices().filter((v) => /^zh/i.test(v.lang));
+  return vs[0] || null;
+}
+function speak(text, rate) {
+  if (!synth) return;
+  try {
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'zh-CN';
+    u.rate = rate || 0.82;
+    if (zhVoice) u.voice = zhVoice;
+    synth.speak(u);
+  } catch (e) {}
+}
+if (synth) {
+  zhVoice = pickVoice();
+  synth.addEventListener('voiceschanged', function () { zhVoice = pickVoice(); });
+}
+
+/* ---------- 字卡 ---------- */
+let order = TERMS.slice();
+let cardIdx = 0;
+let flipped = false;
+
+function shuffle(a) {
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; }
+  return a;
+}
+
+function renderCard(autoSpeak) {
+  const t = order[cardIdx];
+  $('fTerm').textContent = t.zh;
+  $('fPy').textContent = t.py;
+  $('fEn').textContent = t.en;
+  $('fGloss').textContent = t.gloss;
+  $('fTag').textContent = t.tag;
+  $('fPy').classList.toggle('hidden', !flipped);
+  $('fEn').classList.toggle('hidden', !flipped);
+  $('fGloss').classList.toggle('hidden', !flipped);
+  $('fHint').classList.toggle('hidden', flipped);
+  $('flip').textContent = flipped ? '收起答案' : '显示答案';
+  $('cardPos').textContent = (cardIdx + 1) + ' / ' + order.length;
+  if (autoSpeak) speak(t.zh);
+}
+
+function setCard(i, autoSpeak) {
+  cardIdx = (i + order.length) % order.length;
+  flipped = false;
+  renderCard(autoSpeak !== false);
+}
+
+/* ---------- 测验 ---------- */
+const QN = 10;
+const TYPES = ['zh2py', 'py2zh', 'gloss2zh', 'listen2zh'];
+let q = null;
+
+function weightedPick(n, pool) {
+  const bag = (pool || TERMS).slice();
+  const out = [];
+  while (out.length < n && bag.length) {
+    const ws = bag.map(function (t) { const s = stats[t.zh]; return 1 + 3 * (s ? s.w : 0); });
+    let total = 0; for (let i = 0; i < ws.length; i++) total += ws[i];
+    let r = Math.random() * total, k = 0;
+    for (; k < bag.length; k++) { r -= ws[k]; if (r <= 0) break; }
+    if (k >= bag.length) k = bag.length - 1;
+    out.push(bag.splice(k, 1)[0]);
+  }
+  return out;
+}
+
+function makeQuestion(term, type) {
+  const others = shuffle(TERMS.filter(function (t) { return t.zh !== term.zh; })).slice(0, 3);
+  let prompt, options, correct, note;
+  if (type === 'zh2py') {
+    prompt = { kind: 'zh', text: term.zh, tip: '这个术语怎么读？' };
+    correct = term.py;
+    options = [correct].concat(others.map(function (t) { return t.py; }));
+    note = term.zh + ' · ' + term.py + ' · ' + term.en;
+  } else if (type === 'py2zh') {
+    prompt = { kind: 'py', text: term.py, tip: '这个读音对应哪个术语？' };
+    correct = term.zh;
+    options = [correct].concat(others.map(function (t) { return t.zh; }));
+    note = term.zh + ' · ' + term.py + ' · ' + term.gloss;
+  } else if (type === 'gloss2zh') {
+    prompt = { kind: 'gloss', text: term.gloss, tip: '这句话说的是哪个术语？' };
+    correct = term.zh;
+    options = [correct].concat(others.map(function (t) { return t.zh; }));
+    note = term.zh + ' · ' + term.py + ' · ' + term.en;
+  } else {
+    prompt = { kind: 'listen', text: '🔊 点这里重听', tip: '听发音，选出对应的术语' };
+    correct = term.zh;
+    options = [correct].concat(others.map(function (t) { return t.zh; }));
+    note = term.zh + ' · ' + term.py + ' · ' + term.gloss;
+  }
+  return { term: term, type: type, prompt: prompt, options: shuffle(options.slice()), correct: correct, note: note };
+}
+
+function startQuiz(pool) {
+  const picked = weightedPick(QN, pool);
+  if (!picked.length) return;
+  const types = shuffle(TYPES.slice());
+  q = {
+    list: picked.map(function (t, i) { return makeQuestion(t, types[i % types.length]); }),
+    i: 0, score: 0, wrong: [], answered: false
+  };
+  showView('quiz');
+  renderQuestion();
+}
+
+function showView(name) {
+  $('cardsView').hidden = name !== 'cards';
+  $('quizView').hidden = name !== 'quiz';
+  $('result').hidden = name !== 'result';
+  document.querySelectorAll('.tabs button').forEach(function (b) {
+    b.classList.toggle('on', b.dataset.mode === (name === 'cards' ? 'cards' : 'quiz'));
+  });
+}
+
+function renderQuestion() {
+  const item = q.list[q.i];
+  q.answered = false;
+  $('qIdx').textContent = (q.i + 1) + ' / ' + q.list.length;
+  $('qBar').style.width = ((q.i) / q.list.length * 100) + '%';
+  $('qScore').textContent = q.score + ' 分';
+  $('qFb').textContent = '';
+  $('qNext').disabled = true;
+
+  const p = $('qPrompt');
+  p.innerHTML = '';
+  const tip = document.createElement('div');
+  tip.className = 'en';
+  tip.textContent = item.prompt.tip;
+  p.appendChild(tip);
+  const body = document.createElement('div');
+  body.className = item.prompt.kind === 'zh' ? 'big' : (item.prompt.kind === 'py' ? 'mid' : (item.prompt.kind === 'listen' ? 'big' : 'small'));
+  body.textContent = item.prompt.text;
+  if (item.prompt.kind === 'listen') {
+    body.style.cursor = 'pointer';
+    body.title = '点一下重听';
+    body.addEventListener('click', function () { speak(item.term.zh); });
+  }
+  p.appendChild(body);
+
+  $('qReplay').hidden = item.type !== 'listen2zh';
+
+  const box = $('qOpts');
+  box.innerHTML = '';
+  item.options.forEach(function (opt, i) {
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.dataset.i = String(i);
+    const n = document.createElement('span'); n.className = 'n'; n.textContent = String(i + 1);
+    const s = document.createElement('span'); s.textContent = opt;
+    b.appendChild(n); b.appendChild(s);
+    b.addEventListener('click', function () { answer(i); });
+    box.appendChild(b);
+  });
+
+  if (item.type === 'listen2zh') speak(item.term.zh);
+  else if (item.type === 'zh2py' && autoSpeakOn()) speak(item.term.zh);
+}
+
+function autoSpeakOn() { return localStorage.getItem('prh.quiz.speak') === '1'; }
+
+function answer(i) {
+  if (!q || q.answered) return;
+  const item = q.list[q.i];
+  const chosen = item.options[i];
+  const ok = chosen === item.correct;
+  q.answered = true;
+  if (ok) { q.score++; bump(item.term.zh, true); }
+  else { q.wrong.push(item); bump(item.term.zh, false); }
+
+  document.querySelectorAll('#qOpts .opt').forEach(function (b) {
+    const idx = Number(b.dataset.i);
+    if (item.options[idx] === item.correct) { b.classList.add('right'); b.querySelector('.mark') || b.insertAdjacentHTML('beforeend', '<span class="mark">✓</span>'); }
+    else if (idx === i) { b.classList.add('wrong'); b.insertAdjacentHTML('beforeend', '<span class="mark">✗</span>'); }
+    b.disabled = true;
+  });
+
+  $('qFb').innerHTML = (ok ? '<b>对了。</b> ' : '<b>不对。</b> ') + item.note + (item.type === 'listen2zh' ? '' : '');
+  $('qScore').textContent = q.score + ' 分';
+  $('qNext').disabled = false;
+  $('qNext').focus();
+  if (item.type !== 'listen2zh') speak(item.term.zh);
+}
+
+function nextQuestion() {
+  if (!q || !q.answered) return;
+  q.i++;
+  if (q.i >= q.list.length) { finish(); return; }
+  renderQuestion();
+}
+
+function finish() {
+  showView('result');
+  const total = q.list.length;
+  $('rTitle').textContent = q.score === total ? '全对 🎉' : '这一轮结束';
+  $('rScore').textContent = q.score + ' / ' + total;
+  $('rLine').textContent = q.score === total ? '这十个词可以放它们走了；再测一轮换一批。'
+    : '错 ' + q.wrong.length + ' 个。点「只练错题」把它们再过一遍。';
+  const ul = $('rWrong');
+  ul.innerHTML = '';
+  q.wrong.forEach(function (item) {
+    const li = document.createElement('li');
+    const t = document.createElement('span'); t.className = 't'; t.textContent = item.term.zh;
+    const p = document.createElement('span'); p.className = 'p'; p.textContent = item.term.py;
+    const g = document.createElement('span'); g.className = 'g'; g.textContent = item.term.gloss;
+    li.appendChild(t); li.appendChild(p); li.appendChild(g);
+    ul.appendChild(li);
+  });
+  $('onlyWrong').disabled = q.wrong.length === 0;
+}
+
+/* ---------- 事件 ---------- */
+document.querySelectorAll('.tabs button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    if (b.dataset.mode === 'cards') { showView('cards'); }
+    else { startQuiz(); }
+  });
+});
+
+$('flash').addEventListener('click', function () { flipped = !flipped; renderCard(false); });
+$('flip').addEventListener('click', function (e) { e.stopPropagation(); flipped = !flipped; renderCard(false); $('flip').blur(); });
+$('speakBtn').addEventListener('click', function (e) { e.stopPropagation(); speak(order[cardIdx].zh); });
+$('shuffle').addEventListener('click', function () { shuffle(order); cardIdx = 0; flipped = false; renderCard(true); });
+$('nextCard').addEventListener('click', function () { setCard(cardIdx + 1, false); });
+$('prevCard').addEventListener('click', function () { setCard(cardIdx - 1, false); });
+$('know').addEventListener('click', function () { bump(order[cardIdx].zh, true); setCard(cardIdx + 1, true); });
+$('dunno').addEventListener('click', function () { bump(order[cardIdx].zh, false); setCard(cardIdx + 1, true); });
+
+$('qNext').addEventListener('click', nextQuestion);
+$('qReplay').addEventListener('click', function () { speak(q.list[q.i].term.zh); });
+$('again').addEventListener('click', function () { startQuiz(); });
+$('onlyWrong').addEventListener('click', function () {
+  if (!q || !q.wrong.length) return;
+  const pool = q.wrong.map(function (x) { return x.term; });
+  q = null;
+  const saved = QN;
+  const list = weightedPick(Math.min(saved, pool.length), pool);
+  if (!list.length) return;
+  const types = shuffle(TYPES.slice());
+  q = { list: list.map(function (t, i) { return makeQuestion(t, types[i % types.length]); }), i: 0, score: 0, wrong: [], answered: false };
+  showView('quiz');
+  renderQuestion();
+});
+$('toCards').addEventListener('click', function () { showView('cards'); });
+$('reset').addEventListener('click', function (e) {
+  e.preventDefault();
+  stats = {};
+  save();
+  updateStat();
+  q = null;
+  showView('cards');
+});
+
+document.addEventListener('keydown', function (e) {
+  const t = (e.target.tagName || '').toUpperCase();
+  if (t === 'INPUT' || t === 'TEXTAREA') return;
+  const cardsOn = !$('cardsView').hidden;
+  const quizOn = !$('quizView').hidden;
+
+  if (cardsOn) {
+    if (e.code === 'Space') { e.preventDefault(); flipped = !flipped; renderCard(false); }
+    else if (e.code === 'ArrowRight') { e.preventDefault(); setCard(cardIdx + 1, false); }
+    else if (e.code === 'ArrowLeft') { e.preventDefault(); setCard(cardIdx - 1, false); }
+    else if (e.key === 'Enter') { e.preventDefault(); setCard(cardIdx + 1, true); }
+  } else if (quizOn) {
+    if (/^[1-4]$/.test(e.key)) { e.preventDefault(); answer(Number(e.key) - 1); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (q && q.answered) nextQuestion(); }
+  }
+});
+
+/* ---------- 启动 ---------- */
+updateStat();
+setCard(0, false);
+showView('cards');
+
+window.__quiz = {
+  TERMS: TERMS,
+  stats: function () { return stats; },
+  start: function (pool) { startQuiz(pool); },
+  answer: answer,
+  next: nextQuestion,
+  state: function () { return q; },
+  card: function () { return { i: cardIdx, flipped: flipped, term: order[cardIdx] }; }
+};
+})();
+</script>
+</body>
+</html>
